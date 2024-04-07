@@ -23,6 +23,9 @@
         <jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
         <faker.version>2.1.0</faker.version>
         <h2.version>2.2.224</h2.version>
+        <freemarker.version>2.3.32</freemarker.version>
+        <commonslang.version>3.14.0</commonslang.version>
+        <hikari.version>5.1.0</hikari.version>
   </properties>
     <dependencyManagement>
         <dependencies>
@@ -39,7 +42,8 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <scope>provided</scope>
+            <version>6.0.0</version>
+            <scope>provided</scope> 
         </dependency>        
         <dependency>
             <groupId>org.springframework</groupId>
@@ -48,7 +52,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
-        </dependency>        
+        </dependency>   
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-context-support</artifactId>
+		</dependency>             
          <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -93,6 +101,26 @@
 		    <groupId>com.h2database</groupId>
 		    <artifactId>h2</artifactId>
 		    <version>${h2.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.freemarker</groupId>
+		    <artifactId>freemarker</artifactId>
+		    <version>${freemarker.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-lang3</artifactId>
+		    <version>${commonslang.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.zaxxer</groupId>
+		    <artifactId>HikariCP</artifactId>
+		    <version>${hikari.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.liquibase</groupId>
+		    <artifactId>liquibase-core</artifactId>
+		    <version>${liquidbase.version}</version>
 		</dependency>
 		
 		<!-- TEST Dependencies -->
@@ -282,11 +310,6 @@
                                     <directory>${project.basedir}/node_modules/htmx.org/dist</directory>
                                     <include>htmx.min.js</include>
                                     <include>htmx.min.js.gz</include>
-                                </resource>
-                                <resource>
-                                    <directory>${project.basedir}/node_modules/@stomp/stompjs/bundles</directory>
-                                    <include>stomp.umd.min.js</include>
-                                    <include>stomp.umd.js.map</include>
                                 </resource>
                             </resources>
                         </configuration>
