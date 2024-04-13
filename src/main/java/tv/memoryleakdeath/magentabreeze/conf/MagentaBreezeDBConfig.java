@@ -18,27 +18,44 @@ public class MagentaBreezeDBConfig {
     public static final String DB_URL = "jdbc:h2:tcp://localhost/./db/magentabreeze;FILE_LOCK=SOCKET";
 
     @Bean
-    public DataSource getDataSource() {
+    public DataSource dataSource() {
         HikariDataSource ds = new HikariDataSource();
-        ds.setDataSourceClassName("org.h2.Driver");
-        ds.setJdbcUrl(DB_URL);
-        ds.setUsername("mb");
-        ds.setPassword("");
+        ds.setDataSourceClassName("org.h2.jdbcx.JdbcDataSource");
+        ds.addDataSourceProperty("URL", DB_URL);
+        ds.addDataSourceProperty("user", "mb");
+        ds.addDataSourceProperty("password", "");
         return ds;
     }
 
     @Bean
-    public PlatformTransactionManager transactionManager() {
-        return new DataSourceTransactionManager(getDataSource());
+    public PlatformTransactionManager transactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 
     @Bean
-    public JdbcTemplate getJdbcTemplate() {
-        return new JdbcTemplate(getDataSource());
+    public JdbcTemplate getJdbcTemplate(DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
     }
 
     @Bean
-    public NamedParameterJdbcTemplate getNamedParameterJdbcTemplate() {
-        return new NamedParameterJdbcTemplate(getDataSource());
+    public NamedParameterJdbcTemplate getNamedParameterJdbcTemplate(DataSource dataSource) {
+        return new NamedParameterJdbcTemplate(dataSource);
     }
+
+//    @Bean
+//    public DatabaseStartupValidator databaseStartupValidator(DataSource dataSource) {
+//        DatabaseStartupValidator validator = new DatabaseStartupValidator();
+//        validator.setDataSource(dataSource);
+//        validator.setInterval(2);
+//        validator.setTimeout(60);
+//        return validator;
+//    }
+//
+//    @Bean
+//    @DependsOn("databaseStartupValidator")
+//    public LiquibaseRunner databaseMigrationRunner() {
+//        LiquibaseRunner runner = new LiquibaseRunner();
+//        runner.runMigrations();
+//        return runner;
+//    }
 }
