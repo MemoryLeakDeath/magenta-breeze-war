@@ -28,14 +28,10 @@ public class MagentaBreezeInit implements WebApplicationInitializer {
         servletContext.setInitParameter("db.tcpServer", "-tcpAllowOthers");
         servletContext.addListener(new JakartaDbStarter());
 
-//        servletContext.setInitParameter("liquibase.changelog", "src/main/resources/db_migrations.json");
-//        servletContext.setInitParameter("liquibase.datasource", "java:jdbc/ds");
-//        servletContext.addListener(new LiquibaseJakartaServletListener());
-
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher",
                 new DispatcherServlet(rootContext));
         dispatcher.setLoadOnStartup(1);
-        dispatcher.addMapping("/");
+        dispatcher.addMapping("/*");
     }
 
 }

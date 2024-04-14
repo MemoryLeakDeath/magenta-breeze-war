@@ -1,0 +1,27 @@
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="htmx-config" content="${htmxConfig!}"/>
+[#-- <meta id="_csrf" name="_csrf" content="${_csrf.token!}"/>
+<meta id="_csrf_header" name="_csrf_header" content="${_csrf.headerName!}"/>
+--]     
+<title>[@spring.message "site.title"][/@]-${pageTitle!}</title>
+<link rel="stylesheet" href="[@spring.url '/css/fontawesome.min.css'][/@]">
+<link rel="stylesheet" href="[@spring.url '/css/brands.min.css'][/@]">
+<link rel="stylesheet" href="[@spring.url '/css/solid.min.css'][/@]">
+<link rel="stylesheet" href="[@spring.url '/css/regular.min.css'][/@]">
+<link rel="stylesheet" href="[@spring.url '/css/bootstrap.min.css'][/@]">
+<link rel="stylesheet" href="[@spring.url '/css/application.css'][/@]">
+[#if cssList??]
+	[#list cssList as css]
+		<link rel="stylesheet" href="[@spring.url css][/@]">
+	[/#list]
+[/#if]
+<script type="text/javascript" src="[@spring.url '/js/jquery.min.js'][/@]"></script>    
+<script type="text/javascript" src="[@spring.url '/js/bootstrap.bundle.min.js'][/@]"></script>
+<script type="text/javascript" src="[@spring.url '/js/application.js'][/@]"></script>
+<script type="text/javascript" src="[@spring.url '/js/htmx.min.js'][/@]"></script>
+[#if scriptList??]
+	[#list scriptList as script]
+	    <script type="text/javascript" src="[@spring.url script][/@]"></script>
+	[/#list]
+[/#if]

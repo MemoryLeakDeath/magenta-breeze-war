@@ -1,6 +1,7 @@
 package tv.memoryleakdeath.magentabreeze.conf;
 
 import java.util.Locale;
+import java.util.Properties;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -20,15 +22,18 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
+import jakarta.servlet.ServletContext;
 import tv.memoryleakdeath.magentabreeze.interceptors.MagentaBreezeControllerInterceptor;
 
 @Configuration
 @EnableWebMvc
 @ComponentScan("tv.memoryleakdeath.magentabreeze.frontend")
-public class MagentaBreezeWebConfig implements WebMvcConfigurer {
+public class MagentaBreezeWebConfig implements WebMvcConfigurer, ServletContextAware {
 
     @Autowired
     private ApplicationContext ac;
+
+    private ServletContext sc;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -44,9 +49,23 @@ public class MagentaBreezeWebConfig implements WebMvcConfigurer {
     @Bean
     public FreeMarkerConfigurer viewConfig() {
         FreeMarkerConfigurer config = new FreeMarkerConfigurer();
-        config.setDefaultEncoding("UTF-8");
         config.setTemplateLoaderPath("/WEB-INF/views/");
+        config.setFreemarkerSettings(freemarkerSettings());
         return config;
+    }
+
+    private Properties freemarkerSettings() {
+        Properties props = new Properties();
+        props.setProperty("autoImport",
+                "/spring.ftl as spring, macros/macros.html as mb, layout/layout.html as layout");
+        props.setProperty("apiBuiltinEnabled", "true");
+        props.setProperty("defaultEncoding", "UTF-8");
+        props.setProperty("lazyAutoImports", "true");
+        props.setProperty("outputEncoding", "UTF-8");
+        props.setProperty("outputFormat", "HTML");
+        props.setProperty("tagSyntax", "square_bracket");
+        props.setProperty("templateExceptionHandler", "rethrow");
+        return props;
     }
 
     @Bean
@@ -88,5 +107,10 @@ public class MagentaBreezeWebConfig implements WebMvcConfigurer {
         LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
         interceptor.setParamName("language");
         return interceptor;
+    }
+
+    @Override
+    public void setServletContext(ServletContext servletContext) {
+        this.sc = servletContext;
     }
 }

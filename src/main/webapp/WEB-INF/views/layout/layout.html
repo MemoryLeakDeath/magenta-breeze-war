@@ -1,0 +1,19 @@
+[#macro normal]
+<!DOCTYPE html>
+<html>
+<head>
+	[#include "head.html"]
+</head>
+<body class="bg-body-color" data-bs-theme="dark">
+	<div class="row">
+		[#include "navigation.html"]
+		<div class="col-10">
+			<!-- messages -->
+			[#include "messages.html"]
+			<!-- Page Content -->
+			[#nested]
+		</div>		
+	</div>
+</body>
+</html>
+[/#macro]

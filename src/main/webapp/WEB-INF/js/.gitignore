@@ -2,3 +2,5 @@
 /bootstrap.bundle.min.js.map
 /jquery.min.js
 /jquery.min.map
+/htmx.min.js
+/htmx.min.js.gz
