@@ -5,3 +5,29 @@
 [#macro alertCloseButton]
 <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="[@spring.message 'button.close'][/@]"></button>
 [/#macro]
+
+[#macro switchNoLabel name labelLookup value]
+<div class="form-check form-switch mb-4">
+	<input type="checkbox" role="switch" class="form-check-input" name="${name}" value="${value}" [#if value == "true"]checked[/#if] title="[@spring.message labelLookup][/@]">
+</div>
+[/#macro]
+
+[#macro serviceIcon serviceName]
+[#switch serviceName]
+	[#case "TWITCH"]
+		[#assign sn = "twitch"]
+		[#break]
+	[#case "YOUTUBE"]
+		[#assign sn = "youtube"]
+		[#break]
+[/#switch]
+[@fa icon="fa-${sn!}" style="fa-brands"][/@]
+[/#macro]
+
+[#macro buttonIcon id icon iconType titleTextLookup="" extraClass=""]
+	<button type="button" class="btn btn-light ${extraClass}" id="${id}" title="[@spring.message titleTextLookup][/@]">[@fa icon iconType][/@]</button>
+[/#macro]
+
+[#macro buttonText id textLookup icon="" iconType="" extraClass=""]
+	<button type="button" class="btn btn-primary ${extraClass}" id="${id}" title="[@spring.message textLookup][/@]">[@spring.message textLookup][/@]&nbsp;[#if icon != ""][@fa icon iconType][/@][/#if]</button>
+[/#macro]

@@ -20,11 +20,11 @@ public class AlertSettingsDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private static final String GET_ALL_ACTIVE_SETTINGS_SQL = """
-            select %s from alertsettings where active = true
+    private static final String GET_ALL_SETTINGS_SQL = """
+            select %s from alertsettings
             """.formatted(StringUtils.join(COLUMNS, ","));
 
-    public List<AlertSettingsRow> getAllActiveSettings() {
-        return jdbcTemplate.query(GET_ALL_ACTIVE_SETTINGS_SQL, new AlertSettingsRowMapper());
+    public List<AlertSettingsRow> getAllSettings() {
+        return jdbcTemplate.query(GET_ALL_SETTINGS_SQL, new AlertSettingsRowMapper());
     }
 }

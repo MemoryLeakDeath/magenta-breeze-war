@@ -1,24 +1,27 @@
 [@layout.normal]
 <div class="container">
 	<h1>[@spring.message "nav.alerts"][/@]</h1>
-	<p>Active Settings:</p>
-	<table class="table">
+	<div class="col-12">
+		[@mb.buttonText id="createNewButton" textLookup="button.createnew" icon="fa-plus" iconType="fas" extraClass="mb-4"][/@]
+	</div>
+	<p>[@spring.message "label.currentalertsettings"][/@]:</p>
+	<table class="table table-hover">
 		<thead>
 			<tr>
-				<td>ID</td>
-				<td>Service</td>
-				<td>Alert Type</td>
-				<td>Active</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>[@spring.message "label.service"][/@]</td>
+				<td>[@spring.message "label.alerttype"][/@]</td>
 			</tr>
 		</thead>
 		<tbody>
-			[#if allActiveSettings??]
-			[#list allActiveSettings as setting]
-			<tr>
-				<td>${setting.id}</td>
-				<td>${setting.service}</td>
+			[#if allSettings??]
+			[#list allSettings as setting]
+			<tr class="[#if setting.active == false]opacity-50[/#if]">
+				<td style="width: 100px;">[@mb.switchNoLabel name="active" labelLookup="label.active" value=setting.active?c][/@]</tdstyle="max-width: 100px;">
+				<td style="width: 100px;">[@mb.buttonIcon "editButton-${setting.id}" "fa-pencil" "fas" "button.edit" "btn-sm"][/@]</td>
+				<td style="width: 100px;">[@mb.serviceIcon serviceName="${setting.service}"][/@]</tdstyle="max-width: 100px;">
 				<td>${setting.type}</td>
-				<td>${setting.active?c}</td>
 			</tr>
 			[/#list]
 			[/#if]

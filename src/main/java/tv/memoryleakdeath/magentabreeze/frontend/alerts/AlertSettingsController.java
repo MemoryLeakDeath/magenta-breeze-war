@@ -26,10 +26,10 @@ public class AlertSettingsController extends BaseFrontendController {
     @GetMapping("/")
     public String view(HttpServletRequest request, Model model) {
         try {
-            List<AlertSettingsRow> allActiveSettings = settingsDao.getAllActiveSettings();
-            model.addAttribute("allActiveSettings", allActiveSettings);
+            List<AlertSettingsRow> allSettings = settingsDao.getAllSettings();
+            model.addAttribute("allSettings", allSettings);
         } catch (Exception e) {
-            logger.error("Unable to fetch all active settings!");
+            logger.error("Unable to fetch all settings!");
         }
         return "settings/alerts/alerts";
     }
