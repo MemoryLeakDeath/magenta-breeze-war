@@ -1,0 +1,6 @@
+package tv.memoryleakdeath.magentabreeze.common;
+
+public enum AlertTypes {
+    FOLLOW, SUBSCRIBE, SUBSCRIBE_PRIME, SUBSCRIBE_TIER2, SUBSCRIBE_TIER3, BITS, SUBSCRIBE_STREAK, HYPE_TRAIN, RAIDS,
+    MEMBERSHIP, HIGHLIGHTED_MESSAGE;
+}

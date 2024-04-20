@@ -5,15 +5,17 @@
 	[#include "head.html"]
 </head>
 <body class="bg-body-color" data-bs-theme="dark">
-	<div class="row">
+	<div class="row content-height">
 		[#include "navigation.html"]
-		<div class="col-10">
+		<div class="col-9">
 			<!-- messages -->
 			[#include "messages.html"]
 			<!-- Page Content -->
 			[#nested]
 		</div>		
 	</div>
+	<!-- footer content -->
+	[#include "footer.html"]
 </body>
 </html>
 [/#macro]

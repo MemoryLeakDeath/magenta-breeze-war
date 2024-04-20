@@ -1,0 +1,28 @@
+[@layout.normal]
+<div class="container">
+	<h1>[@spring.message "nav.alerts"][/@]</h1>
+	<p>Active Settings:</p>
+	<table class="table">
+		<thead>
+			<tr>
+				<td>ID</td>
+				<td>Service</td>
+				<td>Alert Type</td>
+				<td>Active</td>
+			</tr>
+		</thead>
+		<tbody>
+			[#if allActiveSettings??]
+			[#list allActiveSettings as setting]
+			<tr>
+				<td>${setting.id}</td>
+				<td>${setting.service}</td>
+				<td>${setting.type}</td>
+				<td>${setting.active?c}</td>
+			</tr>
+			[/#list]
+			[/#if]
+		</tbody>
+	</table>
+</div>
+[/@]

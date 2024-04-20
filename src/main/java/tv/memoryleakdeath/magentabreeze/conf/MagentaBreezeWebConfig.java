@@ -1,6 +1,7 @@
 package tv.memoryleakdeath.magentabreeze.conf;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -10,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -22,18 +22,15 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
-import jakarta.servlet.ServletContext;
 import tv.memoryleakdeath.magentabreeze.interceptors.MagentaBreezeControllerInterceptor;
 
 @Configuration
 @EnableWebMvc
 @ComponentScan("tv.memoryleakdeath.magentabreeze.frontend")
-public class MagentaBreezeWebConfig implements WebMvcConfigurer, ServletContextAware {
+public class MagentaBreezeWebConfig implements WebMvcConfigurer {
 
     @Autowired
     private ApplicationContext ac;
-
-    private ServletContext sc;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -76,6 +73,8 @@ public class MagentaBreezeWebConfig implements WebMvcConfigurer, ServletContextA
         view.setPrefix("");
         view.setRequestContextAttribute("rc");
         view.setSuffix(".html");
+        view.setExposeSessionAttributes(true);
+        view.setAttributesMap(Map.of("applicationVersion", ac.getBean("appSourceVersion")));
         return view;
     }
 
@@ -109,8 +108,4 @@ public class MagentaBreezeWebConfig implements WebMvcConfigurer, ServletContextA
         return interceptor;
     }
 
-    @Override
-    public void setServletContext(ServletContext servletContext) {
-        this.sc = servletContext;
-    }
 }
