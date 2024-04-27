@@ -1,50 +1,46 @@
 <div id="topMessagesBox">
 	<!-- error messages -->
-	[#if errorList??]
-		[#list errorList as err]
+	[#if pageMessages?? && pageMessages?api.hasErrors()]
+		[#list pageMessages?api.viewErrors() as err]
 	       <div class="alert alert-danger alert-dismissable" role="alert">
 	          <span>
-	             <i class="fa-solid fa-triangle-exclamation"></i>&nbsp;${err}
+	             <i class="fa-solid fa-triangle-exclamation"></i>&nbsp;[@spring.message err][/@]
 	          </span>
 	          [@mb.alertCloseButton][/@]
 	       </div>
 	    [/#list]
-    	${errorList?api.clear}
     [/#if]
     <!-- warning messages -->
-    [#if warnList??]
-	    [#list warnList as warn]
+    [#if pageMessages?? && pageMessages?api.hasWarnings()]
+	    [#list pageMessages?api.viewWarnings() as warn]
 	       <div class="alert alert-warning alert-dismissable" role="alert">
 	          <span>
-	             <i class="fa-solid fa-circle-exclamation"></i>&nbsp;${warn}
+	             <i class="fa-solid fa-circle-exclamation"></i>&nbsp;[@spring.message warn][/@]
 	          </span>
 	          [@mb.alertCloseButton][/@]
 	       </div>
 	    [/#list]
-    	${warnList?api.clear}
     [/#if]
     <!-- success messages -->
-    [#if successList??]
-	    [#list successList as success]
+    [#if pageMessages?? && pageMessages?api.hasSuccesses()]
+	    [#list pageMessages?api.viewSuccesses() as success]
 	       <div class="alert alert-success alert-dismissable" role="alert">
 	          <span>
-	             <i class="fa-solid fa-circle-check"></i>&nbsp;${success}
+	             <i class="fa-solid fa-circle-check"></i>&nbsp;[@spring.message success][/@]
 	          </span>
 	          [@mb.alertCloseButton][/@]
 	       </div>
 	    [/#list]
-    	${successList?api.clear}
     [/#if]
     <!-- info messages -->
-    [#if infoList??]
-	    [#list infoList as success]
+    [#if pageMessages?? && pageMessages?api.hasInfos()]
+	    [#list pageMessages?api.viewInfos() as info]
 	       <div class="alert alert-success alert-info alert-dismissable" role="alert">
 	          <span>
-	             <i class="fa-solid fa-circle-info"></i>&nbsp;${info}
+	             <i class="fa-solid fa-circle-info"></i>&nbsp;[@spring.message info][/@]
 	          </span>
 	          [@mb.alertCloseButton][/@]
 	       </div>
 	    [/#list]
-    	${infoList?api.clear}
     [/#if]
 </div>

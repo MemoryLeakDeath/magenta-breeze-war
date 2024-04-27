@@ -31,3 +31,26 @@
 [#macro buttonText id textLookup icon="" iconType="" extraClass=""]
 	<button type="button" class="btn btn-primary ${extraClass}" id="${id}" title="[@spring.message textLookup][/@]">[@spring.message textLookup][/@]&nbsp;[#if icon != ""][@fa icon iconType][/@][/#if]</button>
 [/#macro]
+
+[#macro buttonSubmit id textLookup icon="" iconType="" extraClass=""]
+	<button type="submit" class="btn btn-primary ${extraClass}" id="${id}" title="[@spring.message textLookup][/@]">[@spring.message textLookup][/@]&nbsp;[#if icon != ""][@fa icon iconType][/@][/#if]</button>
+[/#macro]
+
+[#macro buttonLink id textLookup url="#" icon="" iconType="" extraClass=""]
+	<a href="[@spring.url url][/@]" role="button" class="btn btn-primary ${extraClass}" id="${id}" title="[@spring.message textLookup][/@]">[@spring.message textLookup][/@]&nbsp;[#if icon != ""][@fa icon iconType][/@][/#if]</a>
+[/#macro]
+
+[#macro inputText id label required extra=""]
+	[@spring.bind id][/@]
+	<div class="mb-2">
+	    <label for="${id}" class="form-label required">[@spring.message label][/@]</label>
+	    <input type="text" class="form-control [#if spring.status.errorMessages?size > 0]is-invalid[/#if]" id="${id}" name="${id}" [#if required]required="required"[/#if] ${extra!}/>
+	    [#if spring.status.errorMessages?size > 0]
+	    	<div id="${id}-error" class="invalid-feedback">
+				[#list spring.status.errorMessages as error]
+					<p>${error}</p>
+				[/#list]
+			</div>
+	    [/#if]
+	</div>
+[/#macro]

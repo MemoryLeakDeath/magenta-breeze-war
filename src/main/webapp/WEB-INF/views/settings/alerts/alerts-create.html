@@ -1,0 +1,9 @@
+[@layout.normal]
+<div class="container">
+	<h1>[@spring.message "text.alerts.create"][/@]</h1>
+	<form action="[@spring.url "/settings/alerts/savenew"][/@]" method="POST" accept-charset="UTF-8">
+		[@mb.inputText "alertSettingsModel.alertText" "label.alerts.alerttext" true][/@]
+		[@mb.buttonSubmit id="createNewButton" textLookup="button.createnew" icon="fa-save" iconType="fas" extraClass="mb-4"][/@]				
+	</form>
+</div>
+[/@]
