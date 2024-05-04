@@ -2,8 +2,28 @@
 <div class="container">
 	<h1>[@spring.message "text.alerts.create"][/@]</h1>
 	<form action="[@spring.url "/settings/alerts/savenew"][/@]" method="POST" accept-charset="UTF-8">
+		[#assign typesLookupUrl]
+			[@spring.url "/settings/alerts/types"][/@]
+		[/#assign]
+		[@mb.inputSelectEnum "alert-settings-service" "alertSettingsModel.service" "label.alerts.service" serviceTypes "text.alerts.servicetypes." 'hx-post="'?no_esc + typesLookupUrl?no_esc + '" hx-target="#alert-settings-type-div" hx-trigger="change" hx-swap="outerHTML"'?no_esc ][/@]
+		[#include "alerts-types-ajax.html"]
 		[@mb.inputText "alertSettingsModel.alertText" "label.alerts.alerttext" true][/@]
-		[@mb.buttonSubmit id="createNewButton" textLookup="button.createnew" icon="fa-save" iconType="fas" extraClass="mb-4"][/@]				
+		[@mb.buttonSubmit id="createNewButton" textLookup="button.createnew" icon="fa-save" iconType="fas" extraClass="mb-4"][/@]
+		<div id="alertColorPicker"></div>				
 	</form>
 </div>
+<script type="text/javascript">
+var colorPicker = new iro.ColorPicker("#alertColorPicker", {
+  width: 250,
+  color: "rgb(255, 0, 0)",
+  borderWidth: 1,
+  borderColor: "#fff",
+});
+
+var alertColorPicked;
+colorPicker.on(["color:init", "color:change"], function(color){
+  alertColorPicked = color.hexString;
+  console.log('Color: ' + alertColorPicked);
+});
+</script>
 [/@]

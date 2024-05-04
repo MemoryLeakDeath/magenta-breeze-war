@@ -2,14 +2,14 @@ package tv.memoryleakdeath.magentabreeze.common.pojo;
 
 import java.io.Serializable;
 
-import tv.memoryleakdeath.magentabreeze.common.AlertTypes;
+import tv.memoryleakdeath.magentabreeze.common.AlertTypeConstants;
 import tv.memoryleakdeath.magentabreeze.common.ServiceTypes;
 
 public class AlertSettingsRow implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long id;
     private ServiceTypes service;
-    private AlertTypes type;
+    private AlertTypeConstants type;
     private boolean active;
     private AlertSettings settings;
 
@@ -45,11 +45,11 @@ public class AlertSettingsRow implements Serializable {
         this.service = service;
     }
 
-    public AlertTypes getType() {
+    public AlertTypeConstants getType() {
         return type;
     }
 
-    public void setType(AlertTypes type) {
+    public void setType(AlertTypeConstants type) {
         this.type = type;
     }
 }

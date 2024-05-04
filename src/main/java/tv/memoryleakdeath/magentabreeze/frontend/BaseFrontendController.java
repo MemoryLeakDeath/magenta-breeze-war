@@ -72,7 +72,6 @@ public class BaseFrontendController {
         pageJS.add(relativePath);
     }
 
-    @SuppressWarnings("unchecked")
     private PageMessages getMessageModel(HttpServletRequest request) {
         PageMessages messages = Optional.ofNullable((PageMessages) request.getSession().getAttribute(PAGE_MESSAGES))
                 .orElseGet(PageMessages::new);

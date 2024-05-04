@@ -26,6 +26,7 @@
         <freemarker.version>2.3.32</freemarker.version>
         <commonslang.version>3.14.0</commonslang.version>
         <hikari.version>5.1.0</hikari.version>
+        <velocity.version>2.3</velocity.version>
   </properties>
     <dependencyManagement>
         <dependencies>
@@ -121,6 +122,16 @@
 		    <groupId>org.liquibase</groupId>
 		    <artifactId>liquibase-core</artifactId>
 		    <version>${liquidbase.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity-engine-core</artifactId>
+			<version>${velocity.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>spring-velocity-support</artifactId>
+			<version>${velocity.version}</version>
 		</dependency>
 		
 		<!-- TEST Dependencies -->
@@ -311,6 +322,10 @@
                                     <include>htmx.min.js</include>
                                     <include>htmx.min.js.gz</include>
                                 </resource>
+                                <resource>
+									<directory>${project.basedir}/node_modules/@jaames/iro/dist</directory>
+									<include>iro.min.js</include>
+								</resource>
                             </resources>
                         </configuration>
                     </execution>

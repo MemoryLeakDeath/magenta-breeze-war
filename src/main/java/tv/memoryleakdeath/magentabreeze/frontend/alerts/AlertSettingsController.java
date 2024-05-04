@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletRequest;
 import tv.memoryleakdeath.magentabreeze.backend.dao.AlertSettingsDao;
+import tv.memoryleakdeath.magentabreeze.common.AlertTypeConstants;
+import tv.memoryleakdeath.magentabreeze.common.ServiceTypes;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsRow;
 import tv.memoryleakdeath.magentabreeze.frontend.BaseFrontendController;
 
@@ -48,6 +51,9 @@ public class AlertSettingsController extends BaseFrontendController {
         if (!model.containsAttribute("alertSettingsModel")) {
             model.addAttribute("alertSettingsModel", new AlertSettingsModel());
         }
+        model.addAttribute("alertTypes", new AlertTypeConstants());
+        model.addAttribute("serviceTypes", ServiceTypes.values());
+        model.addAttribute("service", ServiceTypes.TWITCH);
         return "settings/alerts/alerts-create";
     }
 
@@ -66,5 +72,13 @@ public class AlertSettingsController extends BaseFrontendController {
             addErrorMessage(request, "text.error.systemerror");
         }
         return "redirect:/settings/alerts/";
+    }
+
+    @PostMapping("/types")
+    public String getTypes(HttpServletRequest request, Model model,
+            @RequestParam(value = "alertSettingsModel.service", required = true) String service) {
+        model.addAttribute("service", ServiceTypes.valueOf(service));
+        model.addAttribute("alertTypes", new AlertTypeConstants());
+        return "settings/alerts/alerts-types-ajax";
     }
 }

@@ -43,7 +43,7 @@
 [#macro inputText id label required extra=""]
 	[@spring.bind id][/@]
 	<div class="mb-2">
-	    <label for="${id}" class="form-label required">[@spring.message label][/@]</label>
+	    <label for="${id}" class="form-label [#if required]required[/#if]">[@spring.message label][/@]</label>
 	    <input type="text" class="form-control [#if spring.status.errorMessages?size > 0]is-invalid[/#if]" id="${id}" name="${id}" [#if required]required="required"[/#if] ${extra!}/>
 	    [#if spring.status.errorMessages?size > 0]
 	    	<div id="${id}-error" class="invalid-feedback">
@@ -52,5 +52,27 @@
 				[/#list]
 			</div>
 	    [/#if]
+	</div>
+[/#macro]
+
+[#macro inputSelectForService id name label service values messageKeyStart extra=""]
+	<div class="mb-2" id="${id}-div">
+		<label for="${id}" class="form-label">[@spring.message label][/@]</label>
+		<select id="${id}" name="${name}" class="form-select" ${extra}>
+			[#list values?api.getValues(service) as value]
+				<option value="${value}">[@spring.message messageKeyStart + value][/@]</option>
+			[/#list]
+		</select>
+	</div>
+[/#macro]
+
+[#macro inputSelectEnum id name label values messageKeyStart extra=""]
+	<div class="mb-2" id="${id}-div">
+		<label for="${id}" class="form-label">[@spring.message label][/@]</label>
+		<select id="${id}" name="${name}" class="form-select" ${extra}>
+			[#list values as value]
+				<option value="${value}">[@spring.message messageKeyStart + value][/@]</option>
+			[/#list]
+		</select>
 	</div>
 [/#macro]

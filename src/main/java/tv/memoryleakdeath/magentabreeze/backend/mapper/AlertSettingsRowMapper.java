@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
-import tv.memoryleakdeath.magentabreeze.common.AlertTypes;
+import tv.memoryleakdeath.magentabreeze.common.AlertTypeConstants;
 import tv.memoryleakdeath.magentabreeze.common.ServiceTypes;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsRow;
 
@@ -18,7 +18,7 @@ public class AlertSettingsRowMapper extends BaseMapper implements RowMapper<Aler
         row.setId(rs.getLong("id"));
         row.setService(getEnumTypeFromString(rs.getString("service"), ServiceTypes.class));
         row.setSettings(null);
-        row.setType(getEnumTypeFromString(rs.getString("type"), AlertTypes.class));
+        row.setType(AlertTypeConstants.getType(rs.getString("type")));
         return row;
     }
 
