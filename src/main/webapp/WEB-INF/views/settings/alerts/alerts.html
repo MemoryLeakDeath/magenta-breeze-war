@@ -12,6 +12,7 @@
 				<td>&nbsp;</td>
 				<td>[@spring.message "label.service"][/@]</td>
 				<td>[@spring.message "label.alerttype"][/@]</td>
+				<td>[@spring.message "label.updated"][/@]</td>
 			</tr>
 		</thead>
 		<tbody>
@@ -19,13 +20,27 @@
 			[#list allSettings as setting]
 			<tr class="[#if setting.active == false]opacity-50[/#if]">
 				<td style="width: 100px;">[@mb.switchNoLabel name="active" labelLookup="label.active" value=setting.active?c][/@]</tdstyle="max-width: 100px;">
-				<td style="width: 100px;">[@mb.buttonIcon "editButton-${setting.id}" "fa-pencil" "fas" "button.edit" "btn-sm"][/@]</td>
+				<td style="width: 100px;">[@mb.buttonIcon "editButton-${setting.id}" "fa-pencil" "fas" "button.edit" "btn-sm" 'data-id="'?no_esc + setting.id?no_esc + '"'?no_esc][/@]</td>
 				<td style="width: 100px;">[@mb.serviceIcon serviceName="${setting.service}"][/@]</tdstyle="max-width: 100px;">
 				<td>${setting.type}</td>
+				<td>${setting.updated}</td>
 			</tr>
 			[/#list]
 			[/#if]
 		</tbody>
 	</table>
 </div>
+<form id="edit-form" action="[@spring.url '/settings/alerts/edit'][/@]" method="post" accept-charset="UTF-8">
+	<input type="hidden" name="id" value="">
+</form>
+
+<script type="text/javascript">
+	$('body').on("click", '[id *= "editButton-"]', doEdit);
+	
+	function doEdit() {
+		var id = $(this).data('id');
+		$('#edit-form input[name="id"]').val(id);
+		$('#edit-form').submit();
+	}
+</script>
 [/@]

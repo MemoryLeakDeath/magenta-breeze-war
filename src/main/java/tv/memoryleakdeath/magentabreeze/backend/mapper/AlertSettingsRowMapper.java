@@ -1,15 +1,25 @@
 package tv.memoryleakdeath.magentabreeze.backend.mapper;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.StreamReadFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import tv.memoryleakdeath.magentabreeze.common.AlertTypeConstants;
 import tv.memoryleakdeath.magentabreeze.common.ServiceTypes;
+import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettings;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsRow;
 
 public class AlertSettingsRowMapper extends BaseMapper implements RowMapper<AlertSettingsRow> {
+    private static final Logger logger = LoggerFactory.getLogger(AlertSettingsRowMapper.class);
 
     @Override
     public AlertSettingsRow mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -17,9 +27,21 @@ public class AlertSettingsRowMapper extends BaseMapper implements RowMapper<Aler
         row.setActive(rs.getBoolean("active"));
         row.setId(rs.getLong("id"));
         row.setService(getEnumTypeFromString(rs.getString("service"), ServiceTypes.class));
-        row.setSettings(null);
+        row.setSettings(parseAlertSettings(rs.getBytes("settings")));
         row.setType(AlertTypeConstants.getType(rs.getString("type")));
+        row.setCreated(rs.getTimestamp("created"));
+        row.setUpdated(rs.getTimestamp("updated"));
         return row;
+    }
+
+    private AlertSettings parseAlertSettings(byte[] settings) {
+        ObjectMapper mapper = JsonMapper.builder().enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION).build();
+        try {
+            return mapper.readValue(new String(settings, StandardCharsets.UTF_8), AlertSettings.class);
+        } catch (JsonProcessingException e) {
+            logger.error("Unable to deserialize json to alert settings object!", e);
+        }
+        return null;
     }
 
 }

@@ -322,10 +322,24 @@
                                     <include>htmx.min.js</include>
                                     <include>htmx.min.js.gz</include>
                                 </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>Copy frontend jquery minicolors resources to static js folder</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/src/main/webapp/WEB-INF/js/jquery-minicolors</outputDirectory>
+                            <resources>
                                 <resource>
-									<directory>${project.basedir}/node_modules/@jaames/iro/dist</directory>
-									<include>iro.min.js</include>
-								</resource>
+                                    <directory>${project.basedir}/node_modules/@claviska/jquery-minicolors</directory>
+                                    <include>jquery.minicolors.css</include>
+                                    <include>jquery.minicolors.png</include>
+                                    <include>jquery.minicolors.min.js</include>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>

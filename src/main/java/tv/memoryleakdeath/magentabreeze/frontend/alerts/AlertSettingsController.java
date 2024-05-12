@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import tv.memoryleakdeath.magentabreeze.backend.dao.AlertSettingsDao;
 import tv.memoryleakdeath.magentabreeze.common.AlertTypeConstants;
 import tv.memoryleakdeath.magentabreeze.common.ServiceTypes;
+import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettings;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsRow;
 import tv.memoryleakdeath.magentabreeze.frontend.BaseFrontendController;
 
@@ -58,7 +59,8 @@ public class AlertSettingsController extends BaseFrontendController {
     }
 
     @PostMapping("/savenew")
-    public String saveNew(HttpServletRequest request, Model model, @ModelAttribute AlertSettingsModel settings,
+    public String saveNew(HttpServletRequest request, Model model,
+            @ModelAttribute AlertSettingsModel settings,
             BindingResult bindingResult) {
         try {
             settingsValidator.validate(request, settings, bindingResult);
@@ -67,6 +69,13 @@ public class AlertSettingsController extends BaseFrontendController {
                 addErrorMessage(request, "text.error.systemerror");
                 return createNew(request, model);
             }
+            boolean success = settingsDao.createSettings(buildSettingsObject(settings));
+            if (!success) {
+                logger.error("Unable to save new alert settings!");
+                addErrorMessage(request, "text.error.systemerror");
+            } else {
+                addSuccessMessage(request, "text.alerts.success.created");
+            }
         } catch (Exception e) {
             logger.error("Unable to save new alert settings!", e);
             addErrorMessage(request, "text.error.systemerror");
@@ -74,11 +83,85 @@ public class AlertSettingsController extends BaseFrontendController {
         return "redirect:/settings/alerts/";
     }
 
+    private AlertSettingsRow buildSettingsObject(AlertSettingsModel model) {
+        AlertSettingsRow row = new AlertSettingsRow();
+        row.setActive(true);
+        row.setService(ServiceTypes.valueOf(model.getService()));
+        row.setType(AlertTypeConstants.getType(model.getType()));
+        AlertSettings settings = new AlertSettings();
+        settings.setAlertText(model.getAlertText());
+        settings.setAlertTextColor(model.getAlertTextColor());
+        row.setSettings(settings);
+        return row;
+    }
+
+    private AlertSettingsRow buildSettingsObjectForUpdate(AlertSettingsModel model) {
+        AlertSettingsRow row = buildSettingsObject(model);
+        row.setId(model.getId());
+        return row;
+    }
+
     @PostMapping("/types")
     public String getTypes(HttpServletRequest request, Model model,
-            @RequestParam(value = "alertSettingsModel.service", required = true) String service) {
+            @RequestParam(value = "service", required = true) String service) {
+        model.addAttribute("alertSettingsModel", new AlertSettingsModel());
         model.addAttribute("service", ServiceTypes.valueOf(service));
         model.addAttribute("alertTypes", new AlertTypeConstants());
         return "settings/alerts/alerts-types-ajax";
     }
+
+    @PostMapping("/edit")
+    public String edit(HttpServletRequest request, Model model, @RequestParam(name = "id", required = true) Long id) {
+        setPageTitle(request, model, "text.alerts.edit.title");
+        try {
+            if (!model.containsAttribute("alertSettingsModel")) {
+                AlertSettingsRow row = settingsDao.getSettingsById(id);
+                model.addAttribute("alertSettingsModel", buildModelObject(row));
+                model.addAttribute("service", row.getService());
+            }
+        } catch (Exception e) {
+            addErrorMessage(request, "text.error.systemerror");
+            logger.error("Unable to edit alert with id: " + id, e);
+        }
+        model.addAttribute("alertTypes", new AlertTypeConstants());
+        model.addAttribute("serviceTypes", ServiceTypes.values());
+        return "settings/alerts/alerts-edit";
+    }
+
+    private AlertSettingsModel buildModelObject(AlertSettingsRow row) {
+        AlertSettingsModel model = new AlertSettingsModel();
+        if (row.getSettings() != null) {
+            model.setAlertText(row.getSettings().getAlertText());
+            model.setAlertTextColor(row.getSettings().getAlertTextColor());
+        }
+        model.setService(row.getService().name());
+        model.setType(row.getType().toString());
+        model.setId(row.getId());
+        return model;
+    }
+
+    @PostMapping("/update")
+    public String update(HttpServletRequest request, Model model, @ModelAttribute AlertSettingsModel settings,
+            BindingResult bindingResult) {
+        try {
+            settingsValidator.validate(request, settings, bindingResult);
+            if (bindingResult.hasErrors()) {
+                logger.error("Unable to edit alert settings, validation failed!");
+                addErrorMessage(request, "text.error.systemerror");
+                return edit(request, model, settings.getId());
+            }
+            boolean success = settingsDao.updateSettings(buildSettingsObjectForUpdate(settings));
+            if (!success) {
+                logger.error("Unable to edit alert settings!");
+                addErrorMessage(request, "text.error.systemerror");
+            } else {
+                addSuccessMessage(request, "text.alerts.success.edited");
+            }
+        } catch (Exception e) {
+            logger.error("Unable to edit alert settings!", e);
+            addErrorMessage(request, "text.error.systemerror");
+        }
+        return "redirect:/settings/alerts/";
+    }
+
 }

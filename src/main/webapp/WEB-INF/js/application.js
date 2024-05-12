@@ -1,5 +1,7 @@
 // configure htmx
 htmx.config.includeIndicatorStyles = false;
 
-// configure iro (color picker)
-import iro from '@jaames/iro';
+// configure jquery-minicolors (color picker)
+$.minicolors.defaults = $.extend($.minicolors.defaults, {
+	theme: 'bootstrap'
+});

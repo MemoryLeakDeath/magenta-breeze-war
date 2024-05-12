@@ -1,0 +1,11 @@
+[@layout.normal]
+<div class="container">
+	<h1>[@spring.message "text.alerts.edit"][/@]</h1>
+	<form action="[@spring.url "/settings/alerts/update"][/@]" method="POST" accept-charset="UTF-8">
+		<input type="hidden" name="id" value="${alertSettingsModel.id}">
+		[#include "alerts-common-fields.html"]
+		[@mb.buttonSubmit id="saveButton" textLookup="button.save" icon="fa-save" iconType="fas" extraClass="mb-4"][/@]						
+	</form>
+</div>
+<script type="text/javascript" src="[@spring.url '/js/alerts-settings.js'][/@]"></script>
+[/@]

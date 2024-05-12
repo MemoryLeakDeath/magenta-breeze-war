@@ -7,3 +7,9 @@ body {
 .content-height {
 	height: 90vh;
 }
+
+.required:after {
+    content: '   Required';
+    font-size: 0.6em;
+    color: red; 
+}
