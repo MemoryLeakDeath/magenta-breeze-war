@@ -33,12 +33,9 @@ public class AlertSettingsDao {
         return jdbcTemplate.query(GET_ALL_SETTINGS_SQL, new AlertSettingsRowMapper());
     }
 
-    private static final String CREATE_NEW_SETTINGS_SQL = """
-            insert into alertsettings (service, type, active, settings, created, updated) values (%s)
-            """.formatted(StringUtils.repeat("?", ",", COLUMNS.length - 1));
-
     @Transactional
     public boolean createSettings(AlertSettingsRow newSettings) {
+        String sql = "insert into alertsettings (service, type, active, settings, created, updated) values (?,?,?,? FORMAT JSON,?,?)";
         String jsonSettings = "";
         try {
             jsonSettings = new ObjectMapper().writeValueAsString(newSettings.getSettings());
@@ -47,7 +44,7 @@ public class AlertSettingsDao {
             return false;
         }
         Date createdDate = new Date();
-        int rowsAffected = jdbcTemplate.update(CREATE_NEW_SETTINGS_SQL, newSettings.getService().name(),
+        int rowsAffected = jdbcTemplate.update(sql, newSettings.getService().name(),
                 newSettings.getType().toString(), newSettings.isActive(), jsonSettings, createdDate, createdDate);
         return (rowsAffected > 0);
     }
@@ -87,7 +84,7 @@ public class AlertSettingsDao {
 
     @Transactional
     public boolean updateActiveFlag(Long id, boolean newSetting) {
-        String sql = "update alertsettings set active = ? updated = CURRENT_TIMESTAMP() where id = ?";
+        String sql = "update alertsettings set active = ?, updated = CURRENT_TIMESTAMP() where id = ?";
         int rowsAffected = jdbcTemplate.update(sql, newSetting, id);
         return (rowsAffected > 0);
     }

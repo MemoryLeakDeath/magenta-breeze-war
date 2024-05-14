@@ -19,10 +19,13 @@
 			[#if allSettings??]
 			[#list allSettings as setting]
 			<tr class="[#if setting.active == false]opacity-50[/#if]">
-				<td style="width: 100px;">[@mb.switchNoLabel name="active" labelLookup="label.active" value=setting.active?c][/@]</tdstyle="max-width: 100px;">
-				<td style="width: 100px;">[@mb.buttonIcon "editButton-${setting.id}" "fa-pencil" "fas" "button.edit" "btn-sm" 'data-id="'?no_esc + setting.id?no_esc + '"'?no_esc][/@]</td>
+				<td style="width: 100px;">[@mb.switchNoLabel name="active" labelLookupOn="label.active" labelLookupOff="label.inactive" value=setting.active?c extra='data-id="'?no_esc + setting.id?no_esc + '"'?no_esc][/@]</td>
+				<td style="width: 100px;">
+					[@mb.buttonIcon "editButton-${setting.id}" "fa-pencil" "fas" "button.edit" "btn-sm" 'data-id="'?no_esc + setting.id?no_esc + '"'?no_esc][/@]
+					[@mb.buttonIcon "deleteButton-${setting.id}" "fa-trash" "fas" "button.delete" "btn-sm" 'data-id="'?no_esc + setting.id?no_esc + '"'?no_esc][/@]
+			    </td>
 				<td style="width: 100px;">[@mb.serviceIcon serviceName="${setting.service}"][/@]</tdstyle="max-width: 100px;">
-				<td>${setting.type}</td>
+				<td>[@spring.message 'text.alerts.alerttypes.' + setting.type][/@]</td>
 				<td>${setting.updated}</td>
 			</tr>
 			[/#list]
@@ -34,13 +37,52 @@
 	<input type="hidden" name="id" value="">
 </form>
 
+<form id="delete-form" action="[@spring.url '/settings/alerts/delete'][/@]" method="post" accept-charset="UTF-8">
+	<input type="hidden" name="id" value="">
+</form>
+
 <script type="text/javascript">
 	$('body').on("click", '[id *= "editButton-"]', doEdit);
+	$('body').on('change', 'input[name="active"]', toggleActive);
+	$('body').on('click', '[id *= "deleteButton-"]', doDelete);
 	
 	function doEdit() {
 		var id = $(this).data('id');
 		$('#edit-form input[name="id"]').val(id);
 		$('#edit-form').submit();
+	}
+	
+	function toggleActive() {
+		var id = $(this).data('id');
+		var closeMsg = "[@spring.message 'button.close'][/@]";
+		var errorMsg = "[@spring.message 'text.error.systemerror'][/@]";
+		var url = "[@spring.url '/settings/alerts/toggleactive'][/@]";
+		var activeFlag = $(this).prop('checked');
+		var that = $(this);
+		$.post(url, {"id": id, "active": activeFlag}).done(function() {
+			toggleAlertRowOpacity($(that).closest('tr'), activeFlag);
+		}).fail(function() {
+			$(that).prop('checked', !activeFlag);
+			toggleAlertRowOpacity($(that).closest('tr'), !activeFlag);
+			showErrorMessage(errorMsg, closeMsg);			
+		});
+	}
+	
+	function toggleAlertRowOpacity(row, activeFlag) {
+		if(activeFlag && $(row).hasClass('opacity-50')) {
+			$(row).removeClass('opacity-50');
+		} else if(!activeFlag && !$(row).hasClass('opacity-50')) {
+			$(row).addClass('opacity-50');
+		}
+	}
+		
+	function doDelete() {
+		var id = $(this).data('id');
+		var confirmMsg = "[@spring.message 'text.alerts.confirm.delete'][/@]";
+		if(confirm(confirmMsg)) {
+			$('#delete-form input[name="id"]').val(id);
+			$('#delete-form').submit();
+		}
 	}
 </script>
 [/@]

@@ -6,9 +6,20 @@
 <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="[@spring.message 'button.close'][/@]"></button>
 [/#macro]
 
-[#macro switchNoLabel name labelLookup value]
+[#macro switchNoLabel name labelLookupOn labelLookupOff value extra=""]
+[#if value == "true"]
+	[#assign checked = "checked"]
+	[#assign title]
+		[@spring.message labelLookupOn][/@]
+	[/#assign]
+[#else]
+	[#assign checked = ""]
+	[#assign title]
+		[@spring.message labelLookupOff][/@]
+	[/#assign]
+[/#if]
 <div class="form-check form-switch mb-4">
-	<input type="checkbox" role="switch" class="form-check-input" name="${name}" value="${value}" [#if value == "true"]checked[/#if] title="[@spring.message labelLookup][/@]">
+	<input type="checkbox" role="switch" class="form-check-input" name="${name}" value="${value}" ${checked} title="${title}" ${extra}>
 </div>
 [/#macro]
 
@@ -40,6 +51,10 @@
 
 [#macro buttonSubmit id textLookup icon="" iconType="" extraClass=""]
 	<button type="submit" class="btn btn-primary ${extraClass}" id="${id}" title="[@spring.message textLookup][/@]">[@spring.message textLookup][/@]&nbsp;[#if icon != ""][@fa icon iconType][/@][/#if]</button>
+[/#macro]
+
+[#macro buttonCancel textLookup link extraClass="" extraAttributes=""]
+	<a href="${link}" role="button" class="btn btn-light ${extraClass}" title="[@spring.message textLookup][/@]" ${extraAttributes}>[@spring.message textLookup][/@]&nbsp;[@fa 'fa-x' 'fas'][/@]</a>
 [/#macro]
 
 [#macro buttonLink id textLookup url="#" icon="" iconType="" extraClass=""]

@@ -35,7 +35,7 @@
     <!-- info messages -->
     [#if pageMessages?? && pageMessages?api.hasInfos()]
 	    [#list pageMessages?api.viewInfos() as info]
-	       <div class="alert alert-success alert-info alert-dismissable" role="alert">
+	       <div class="alert alert-info alert-dismissable" role="alert">
 	          <span>
 	             <i class="fa-solid fa-circle-info"></i>&nbsp;[@spring.message info][/@]
 	          </span>

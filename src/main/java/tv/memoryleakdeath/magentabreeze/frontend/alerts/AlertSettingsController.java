@@ -5,6 +5,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -159,6 +161,40 @@ public class AlertSettingsController extends BaseFrontendController {
             }
         } catch (Exception e) {
             logger.error("Unable to edit alert settings!", e);
+            addErrorMessage(request, "text.error.systemerror");
+        }
+        return "redirect:/settings/alerts/";
+    }
+
+    @PostMapping("/toggleactive")
+    public ResponseEntity<Void> toggleAlertStatus(HttpServletRequest request, Model model,
+            @RequestParam(name = "id", required = true) Long id,
+            @RequestParam(name = "active", required = true) boolean activeFlag) {
+        try {
+            boolean success = settingsDao.updateActiveFlag(id, activeFlag);
+            if (!success) {
+                logger.error("Unable to toggle alert status for id: {}", id);
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception e) {
+            logger.error("Unable to toggle alert status for id: " + id, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/delete")
+    public String delete(HttpServletRequest request, Model model, @RequestParam(name = "id", required = true) Long id) {
+        try {
+            boolean success = settingsDao.deleteSettings(id);
+            if (success) {
+                addSuccessMessage(request, "text.alerts.success.delete");
+            } else {
+                logger.error("unable to delete alert with id: {}", id);
+                addErrorMessage(request, "text.error.systemerror");
+            }
+        } catch (Exception e) {
+            logger.error("unable to delete alert with id: " + id, e);
             addErrorMessage(request, "text.error.systemerror");
         }
         return "redirect:/settings/alerts/";

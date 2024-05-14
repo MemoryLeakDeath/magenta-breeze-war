@@ -3,7 +3,13 @@
 	<h1>[@spring.message "text.alerts.create"][/@]</h1>
 	<form action="[@spring.url "/settings/alerts/savenew"][/@]" method="POST" accept-charset="UTF-8">
 		[#include "alerts-common-fields.html"]
-		[@mb.buttonSubmit id="createNewButton" textLookup="button.createnew" icon="fa-save" iconType="fas" extraClass="mb-4"][/@]						
+		<span class="mb-4">
+			[@mb.buttonSubmit id="createNewButton" textLookup="button.createnew" icon="fa-save" iconType="fas" extraClass="me-3"][/@]
+			[#assign cancelLink]
+				[@spring.url '/settings/alerts/'][/@]
+			[/#assign]
+			[@mb.buttonCancel "button.cancel" cancelLink][/@]						
+		</span>
 	</form>
 </div>
 <script type="text/javascript" src="[@spring.url '/js/alerts-settings.js'][/@]"></script>
