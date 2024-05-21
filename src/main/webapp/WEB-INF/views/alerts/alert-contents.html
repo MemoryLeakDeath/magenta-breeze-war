@@ -1,0 +1,41 @@
+<style>
+	.alert {
+		opacity: 0;
+		color: ${alertSettings.settings.alertTextColor};
+	}
+	
+	.animate-alert {
+		animation: fadeInAndOut 5000ms forwards;
+	}
+	
+	@keyframes fadeInAndOut {
+		0%,100% {
+			opacity: 0;
+		}
+		50% {
+			opacity: 1;
+		}
+	}
+</style>
+<div id="alert-${alertSettings.id}" hx-get="[@spring.url "/alerts/contents/${alertSettings.id}"][/@]" hx-trigger="sse:trigger-alert" class="alert">	
+</div>	
+<script type="text/javascript">
+	$('body').on('htmx:afterSettle', handleSSEEvent);
+	$('#alert-${alertSettings.id}').on('animationend', stopAnimation);
+	
+	function handleSSEEvent(event) {
+		if(event.detail.elt.id == 'alert-${alertSettings.id}') {
+			doAnimation();
+		}
+	}
+	
+	function doAnimation() {
+		console.log("Start animation!");
+		$('#alert-${alertSettings.id}').addClass('animate-alert');
+	}
+	
+	function stopAnimation() {
+		console.log("END animation!");
+		$('#alert-${alertSettings.id}').removeClass('animate-alert');		
+	}
+</script>

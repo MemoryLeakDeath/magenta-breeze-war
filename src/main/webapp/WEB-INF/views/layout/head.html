@@ -11,18 +11,19 @@
 <link rel="stylesheet" href="[@spring.url '/css/bootstrap.min.css'][/@]">
 <link rel="stylesheet" href="[@spring.url '/js/jquery-minicolors/jquery.minicolors.css'][/@]">
 <link rel="stylesheet" href="[@spring.url '/css/application.css'][/@]">
-[#if cssList??]
-	[#list cssList as css]
+[#if pageCSSScripts??]
+	[#list pageCSSScripts as css]
 		<link rel="stylesheet" href="[@spring.url css][/@]">
 	[/#list]
 [/#if]
 <script type="text/javascript" src="[@spring.url '/js/jquery.min.js'][/@]"></script>    
 <script type="text/javascript" src="[@spring.url '/js/bootstrap.bundle.min.js'][/@]"></script>
 <script type="text/javascript" src="[@spring.url '/js/htmx.min.js'][/@]"></script>
+<script type="text/javascript" src="[@spring.url '/js/sse.js'][/@]"></script>  <!-- part of htmx -->
 <script type="text/javascript" src="[@spring.url '/js/jquery-minicolors/jquery.minicolors.min.js'][/@]"></script>
 <script type="text/javascript" src="[@spring.url '/js/application.js'][/@]"></script>
-[#if scriptList??]
-	[#list scriptList as script]
+[#if pageJSScripts??]
+	[#list pageJSScripts as script]
 	    <script type="text/javascript" src="[@spring.url script][/@]"></script>
 	[/#list]
 [/#if]

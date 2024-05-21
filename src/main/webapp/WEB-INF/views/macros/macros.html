@@ -61,6 +61,10 @@
 	<a href="[@spring.url url][/@]" role="button" class="btn btn-primary ${extraClass}" id="${id}" title="[@spring.message textLookup][/@]">[@spring.message textLookup][/@]&nbsp;[#if icon != ""][@fa icon iconType][/@][/#if]</a>
 [/#macro]
 
+[#macro buttonLinkNoText id titleLookup url="#" icon="" iconType="" extraClass=""]
+	<a href="[@spring.url url][/@]" role="button" class="btn btn-light ${extraClass}" id="${id}" title="[@spring.message titleLookup][/@]">[#if icon != ""][@fa icon iconType][/@][/#if]</a>
+[/#macro]
+
 [#macro inputText id name model label required extra=""]
 	[@spring.bind model + "." + name][/@]
 	<div class="mb-2">

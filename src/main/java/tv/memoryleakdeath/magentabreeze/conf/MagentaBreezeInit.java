@@ -30,6 +30,7 @@ public class MagentaBreezeInit implements WebApplicationInitializer {
 
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher",
                 new DispatcherServlet(rootContext));
+        dispatcher.setAsyncSupported(true);
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/*");
     }

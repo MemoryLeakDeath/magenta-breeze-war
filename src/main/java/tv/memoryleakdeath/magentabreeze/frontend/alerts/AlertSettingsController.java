@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import tv.memoryleakdeath.magentabreeze.backend.dao.AlertSettingsDao;
 import tv.memoryleakdeath.magentabreeze.common.AlertTypeConstants;
 import tv.memoryleakdeath.magentabreeze.common.ServiceTypes;
+import tv.memoryleakdeath.magentabreeze.common.pojo.AlertEventPayload;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettings;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsRow;
 import tv.memoryleakdeath.magentabreeze.frontend.BaseFrontendController;
@@ -34,6 +37,9 @@ public class AlertSettingsController extends BaseFrontendController {
 
     @Autowired
     private AlertSettingsValidator<AlertSettingsModel> settingsValidator;
+
+    @Autowired
+    private ApplicationContext context;
 
     @GetMapping("/")
     public String view(HttpServletRequest request, Model model) {
@@ -195,6 +201,20 @@ public class AlertSettingsController extends BaseFrontendController {
             }
         } catch (Exception e) {
             logger.error("unable to delete alert with id: " + id, e);
+            addErrorMessage(request, "text.error.systemerror");
+        }
+        return "redirect:/settings/alerts/";
+    }
+
+    @GetMapping("/test/{id}")
+    public String testAlert(HttpServletRequest request, Model model, @PathVariable(name = "id") Long id) {
+        AlertEventPayload testPayload = new AlertEventPayload();
+        testPayload.setEventId(id);
+        try {
+            context.publishEvent(testPayload);
+            addSuccessMessage(request, "text.alerts.success.test");
+        } catch (Exception e) {
+            logger.error("Unable to publish test alert event!", e);
             addErrorMessage(request, "text.error.systemerror");
         }
         return "redirect:/settings/alerts/";

@@ -322,6 +322,10 @@
                                     <include>htmx.min.js</include>
                                     <include>htmx.min.js.gz</include>
                                 </resource>
+                                <resource>
+                                    <directory>${project.basedir}/node_modules/htmx.org/dist/ext</directory>
+                                    <include>sse.js</include>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
