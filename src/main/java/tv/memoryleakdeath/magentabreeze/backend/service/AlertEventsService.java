@@ -14,6 +14,18 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertEventPayload;
 
+/**
+ * The AlertEventsService class is responsible for managing Server-Sent Events
+ * (SSE) emitters and sending alert events to them.
+ * 
+ * This class maintains a list of SseEmitter objects, which represent clients
+ * that are listening for events. When an alert event is received, it is sent to
+ * all registered emitters.
+ * 
+ * If an emitter completes or times out, it is removed from the list of active
+ * emitters. If an error occurs while sending an event to an emitter, the
+ * emitter is completed with the error and removed from the list.
+ */
 @Service
 public class AlertEventsService {
     private static final Logger logger = LoggerFactory.getLogger(AlertEventsService.class);
@@ -31,6 +43,7 @@ public class AlertEventsService {
         emitter.onTimeout(() -> {
             logger.debug("Emitter timed out!");
             emitter.complete();
+            listenerEventList.remove(emitter);
         });
     }
 
