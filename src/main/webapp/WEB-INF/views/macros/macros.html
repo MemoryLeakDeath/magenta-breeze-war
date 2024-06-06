@@ -103,3 +103,35 @@
 		</select>
 	</div>
 [/#macro]
+
+[#macro inputSelectNumber id name model label rangeStart rangeEnd extra=""]
+	[@spring.bind model + "." + name][/@]
+	<div class="mb-2" id="${id}-div">
+		<label for="${id}" class="form-label">[@spring.message label][/@]</label>
+		<select id="${id}" name="${name}" class="form-select" ${extra}>
+			[#list rangeStart..rangeEnd as value]
+				<option value="${value}" [#if spring.status.value?? && spring.status.value == "${value}"]selected[/#if]>${value}</option>
+			[/#list]
+		</select>
+	</div>
+[/#macro]
+
+[#macro modalSaveClose modalId titleDivId contentDivId saveTextLookup saveClickHandler="" modalClass="" extraAttributes="" titleContent="" bodyContent="" bodyExtraAttributes=""]
+<div class="modal" tabindex="-1" id="${modalId}" ${extraAttributes}>
+  <div class="modal-dialog ${modalClass}" style="transform: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="${titleDivId}">${titleContent}</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="[@spring.message 'button.close'][/@]"></button>
+      </div>
+      <div class="modal-body" id="${contentDivId}" ${bodyExtraAttributes}>
+        ${bodyContent}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">[@spring.message 'button.close'][/@]</button>
+        <button type="button" class="btn btn-primary" onclick="${saveClickHandler}">[@spring.message saveTextLookup][/@]</button>
+      </div>
+    </div>
+  </div>
+</div>
+[/#macro]

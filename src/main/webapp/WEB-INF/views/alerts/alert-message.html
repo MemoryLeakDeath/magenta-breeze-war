@@ -1,1 +1,7 @@
-${alertSettings.settings.alertText}
+[#if alertSettings.imageId??]
+	<h1>Asset: ${alertSettings.imageId}</h1>
+[/#if]
+<p class="d-flex justify-content-center" 
+   style="font-size: ${alertSettings.settings.alertTextSize}; font-weight: bold; color: ${alertSettings.settings.alertTextColor}">
+   ${alertSettings.settings.alertText}
+</p>

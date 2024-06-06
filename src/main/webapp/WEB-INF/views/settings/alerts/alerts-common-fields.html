@@ -5,3 +5,24 @@
 [#include "alerts-types-ajax.html"]
 [@mb.inputText "alert-text" "alertText" "alertSettingsModel" "label.alerts.alerttext" true][/@]
 [@mb.inputText "alert-text-color" "alertTextColor" "alertSettingsModel" "label.alerts.alerttextcolor" true][/@]
+[@mb.inputSelectNumber "alert-text-size" "alertTextSize" "alertSettingsModel" "label.alerts.alerttextsize" 18 150][/@]
+<div class="mt-3">
+	<input type="hidden" name="alertImageId" id="alert-image-id" value="${alertSettingsModel.alertImageId!}">
+	<label for "image-select-button">[@spring.message 'text.alertimage'][/@]</label>
+	[@mb.buttonText "image-select-button" "text.selectimage" "fa-wand-magic-sparkles" "fas"][/@]
+</div>
+<div class="mt-4 mb-5">
+	<input type="hidden" name="alertSoundId" id="alert-audio-id" value="${alertSettingsModel.alertSoundId!}">
+	<label for "audio-select-button">[@spring.message 'text.alertaudio'][/@]</label>
+    [@mb.buttonText "audio-select-button" "text.selectaudio" "fa-wand-magic-sparkles" "fas"][/@]
+</div>
+
+[#assign imageWidgetUrl]
+	[@spring.url "/assets/image"][/@]
+[/#assign]
+[#assign audioWidgetUrl]
+	[@spring.url "/assets/audio"][/@]
+[/#assign]
+
+[@mb.modalSaveClose "image-select-modal" "image-select-modal-title" "image-select-modal-body" "button.save" "handleSaveImage(); return true;" "modal-lg" "data-url=${imageWidgetUrl}"][/@]
+[@mb.modalSaveClose "audio-select-modal" "audio-select-modal-title" "audio-select-modal-body" "button.save" "handleSaveAudio(); return true;" "modal-lg" "data-url=${audioWidgetUrl}"][/@]

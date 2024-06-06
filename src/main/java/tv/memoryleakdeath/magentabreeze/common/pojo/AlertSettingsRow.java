@@ -15,6 +15,8 @@ public class AlertSettingsRow implements Serializable {
     private AlertSettings settings;
     private Date created;
     private Date updated;
+    private Long imageId;
+    private Long soundId;
 
     public Long getId() {
         return id;
@@ -70,5 +72,21 @@ public class AlertSettingsRow implements Serializable {
 
     public void setUpdated(Date updated) {
         this.updated = updated;
+    }
+
+    public Long getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(Long imageId) {
+        this.imageId = imageId;
+    }
+
+    public Long getSoundId() {
+        return soundId;
+    }
+
+    public void setSoundId(Long soundId) {
+        this.soundId = soundId;
     }
 }

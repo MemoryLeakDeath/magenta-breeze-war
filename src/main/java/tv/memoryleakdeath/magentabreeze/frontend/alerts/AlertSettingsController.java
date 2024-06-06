@@ -96,9 +96,12 @@ public class AlertSettingsController extends BaseFrontendController {
         row.setActive(true);
         row.setService(ServiceTypes.valueOf(model.getService()));
         row.setType(AlertTypeConstants.getType(model.getType()));
+        row.setImageId(model.getAlertImageId());
+        row.setSoundId(model.getAlertSoundId());
         AlertSettings settings = new AlertSettings();
         settings.setAlertText(model.getAlertText());
         settings.setAlertTextColor(model.getAlertTextColor());
+        settings.setAlertTextSize(model.getAlertTextSize());
         row.setSettings(settings);
         return row;
     }
@@ -123,9 +126,9 @@ public class AlertSettingsController extends BaseFrontendController {
         setPageTitle(request, model, "text.alerts.edit.title");
         try {
             if (!model.containsAttribute("alertSettingsModel")) {
-                AlertSettingsRow row = settingsDao.getSettingsById(id);
-                model.addAttribute("alertSettingsModel", buildModelObject(row));
-                model.addAttribute("service", row.getService());
+                AlertSettingsRow settings = settingsDao.getSettingsById(id);
+                model.addAttribute("alertSettingsModel", buildModelObject(settings));
+                model.addAttribute("service", settings.getService());
             }
         } catch (Exception e) {
             addErrorMessage(request, "text.error.systemerror");
@@ -141,10 +144,13 @@ public class AlertSettingsController extends BaseFrontendController {
         if (row.getSettings() != null) {
             model.setAlertText(row.getSettings().getAlertText());
             model.setAlertTextColor(row.getSettings().getAlertTextColor());
+            model.setAlertTextSize(row.getSettings().getAlertTextSize());
         }
         model.setService(row.getService().name());
         model.setType(row.getType().toString());
         model.setId(row.getId());
+        model.setAlertImageId(row.getImageId());
+        model.setAlertSoundId(row.getSoundId());
         return model;
     }
 

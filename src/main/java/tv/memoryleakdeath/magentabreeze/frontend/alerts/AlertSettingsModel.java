@@ -10,6 +10,9 @@ public class AlertSettingsModel implements Serializable {
     private String service;
     private String alertTextColor = "#ffffff";
     private Long id;
+    private Integer alertTextSize = 48;
+    private Long alertImageId;
+    private Long alertSoundId;
 
     public String getAlertText() {
         return alertText;
@@ -49,6 +52,30 @@ public class AlertSettingsModel implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getAlertTextSize() {
+        return alertTextSize;
+    }
+
+    public void setAlertTextSize(Integer alertTextSize) {
+        this.alertTextSize = alertTextSize;
+    }
+
+    public Long getAlertImageId() {
+        return alertImageId;
+    }
+
+    public void setAlertImageId(Long alertImageId) {
+        this.alertImageId = alertImageId;
+    }
+
+    public Long getAlertSoundId() {
+        return alertSoundId;
+    }
+
+    public void setAlertSoundId(Long alertSoundId) {
+        this.alertSoundId = alertSoundId;
     }
 
 }

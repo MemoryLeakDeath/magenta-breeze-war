@@ -6,11 +6,14 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -32,6 +35,10 @@ public class MagentaBreezeWebConfig implements WebMvcConfigurer {
     @Autowired
     private ApplicationContext ac;
 
+    @Autowired
+    @Qualifier("installBaseDir")
+    private String installBaseDir;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/js/**").addResourceLocations("/WEB-INF/js/").resourceChain(true).addResolver(new EncodedResourceResolver()).addResolver(new PathResourceResolver());
@@ -40,6 +47,8 @@ public class MagentaBreezeWebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/images/**").addResourceLocations("/WEB-INF/images/").resourceChain(true).addResolver(new EncodedResourceResolver()).addResolver(new PathResourceResolver());
         registry.addResourceHandler("/favicon.ico").addResourceLocations("/WEB-INF/images/favicon.ico").resourceChain(true).addResolver(new EncodedResourceResolver())
                 .addResolver(new PathResourceResolver());
+        registry.addResourceHandler("/uploads/**").addResourceLocations("file:///" + installBaseDir + "/uploads/")
+                .resourceChain(true).addResolver(new EncodedResourceResolver()).addResolver(new PathResourceResolver());
     }
 
 
@@ -106,6 +115,11 @@ public class MagentaBreezeWebConfig implements WebMvcConfigurer {
         LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
         interceptor.setParamName("language");
         return interceptor;
+    }
+
+    @Bean
+    public MultipartResolver multipartResolver() {
+        return new StandardServletMultipartResolver();
     }
 
 }

@@ -31,6 +31,16 @@ public class AlertSettingsRowMapper extends BaseMapper implements RowMapper<Aler
         row.setType(AlertTypeConstants.getType(rs.getString("type")));
         row.setCreated(rs.getTimestamp("created"));
         row.setUpdated(rs.getTimestamp("updated"));
+        Long imageId = rs.getLong("imageid");
+        if (rs.wasNull()) {
+            imageId = null;
+        }
+        row.setImageId(imageId);
+        Long soundId = rs.getLong("soundid");
+        if (rs.wasNull()) {
+            soundId = null;
+        }
+        row.setSoundId(soundId);
         return row;
     }
 

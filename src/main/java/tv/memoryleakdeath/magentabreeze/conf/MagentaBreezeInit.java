@@ -7,11 +7,16 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRegistration;
 
 public class MagentaBreezeInit implements WebApplicationInitializer {
+    public static final long MAX_UPLOAD_SIZE = 100L * 1024L * 1024L; // 100MB
+    public static final long MAX_UPLOAD_REQUEST_SIZE = 3L * MAX_UPLOAD_SIZE; // 300MB
+    public static final int FILE_SIZE_THRESHOLD = 50 * 1024; // 50KB
+    public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
@@ -33,6 +38,8 @@ public class MagentaBreezeInit implements WebApplicationInitializer {
         dispatcher.setAsyncSupported(true);
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/*");
+        dispatcher.setMultipartConfig(
+                new MultipartConfigElement(TEMP_DIR, MAX_UPLOAD_REQUEST_SIZE, MAX_UPLOAD_SIZE, FILE_SIZE_THRESHOLD));
     }
 
 }

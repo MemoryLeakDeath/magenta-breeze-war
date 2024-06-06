@@ -30,4 +30,9 @@ public class MagentaBreezeApplicationConfig {
         VelocityEngineFactoryBean velFactory = new VelocityEngineFactoryBean();
         return velFactory.createVelocityEngine();
     }
+
+    @Bean(name = "installBaseDir")
+    public String installBaseDir() {
+        return "/home/mem/magentabreeze"; // TODO: read from command line args
+    }
 }
