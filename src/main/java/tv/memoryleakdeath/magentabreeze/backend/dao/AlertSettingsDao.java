@@ -15,7 +15,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import tv.memoryleakdeath.magentabreeze.backend.mapper.AlertSettingsRowMapper;
+import tv.memoryleakdeath.magentabreeze.backend.mapper.AlertSettingsWithAssetsRowMapper;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsRow;
+import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsWithAssets;
 
 @Repository
 public class AlertSettingsDao {
@@ -89,5 +91,28 @@ public class AlertSettingsDao {
         String sql = "update alertsettings set active = ?, updated = CURRENT_TIMESTAMP() where id = ?";
         int rowsAffected = jdbcTemplate.update(sql, newSetting, id);
         return (rowsAffected > 0);
+    }
+
+    private static final String GET_SETTINGS_WITH_ASSETS_SQL = """
+            select %s,%s,%s from alertsettings as settings
+            left outer join assets as image on settings.imageid = image.id
+            left outer join assets as sound on settings.soundid = sound.id
+            where settings.id = ?
+            """.formatted(StringUtils.join(prefixedAliasedColumns(COLUMNS, "settings"), ","),
+            StringUtils.join(prefixedAliasedColumns(AssetsDao.COLUMNS, "image"), ","),
+            StringUtils.join(prefixedAliasedColumns(AssetsDao.COLUMNS, "sound"), ","));
+
+    public AlertSettingsWithAssets getSettingsWithAssets(Long id) {
+        List<AlertSettingsWithAssets> results = jdbcTemplate.query(GET_SETTINGS_WITH_ASSETS_SQL,
+                new AlertSettingsWithAssetsRowMapper(), id);
+        return results.stream().findFirst().orElse(null);
+    }
+
+    private static String[] prefixedAliasedColumns(String[] columns, String prefix) {
+        String[] prefixed = new String[columns.length];
+        for (int i = 0; i < columns.length; i++) {
+            prefixed[i] = prefix + "." + columns[i] + " as " + prefix + "_" + columns[i];
+        }
+        return prefixed;
     }
 }

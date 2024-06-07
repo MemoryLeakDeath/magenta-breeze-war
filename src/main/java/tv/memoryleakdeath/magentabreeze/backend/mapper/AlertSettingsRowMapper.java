@@ -44,6 +44,28 @@ public class AlertSettingsRowMapper extends BaseMapper implements RowMapper<Aler
         return row;
     }
 
+    public AlertSettingsRow mapRowWithPrefix(ResultSet rs, int rowNum, String prefix) throws SQLException {
+        AlertSettingsRow row = new AlertSettingsRow();
+        row.setActive(rs.getBoolean(prefix + "_active"));
+        row.setId(rs.getLong(prefix + "_id"));
+        row.setService(getEnumTypeFromString(rs.getString(prefix + "_service"), ServiceTypes.class));
+        row.setSettings(parseAlertSettings(rs.getBytes(prefix + "_settings")));
+        row.setType(AlertTypeConstants.getType(rs.getString(prefix + "_type")));
+        row.setCreated(rs.getTimestamp(prefix + "_created"));
+        row.setUpdated(rs.getTimestamp(prefix + "_updated"));
+        Long imageId = rs.getLong(prefix + "_imageid");
+        if (rs.wasNull()) {
+            imageId = null;
+        }
+        row.setImageId(imageId);
+        Long soundId = rs.getLong(prefix + "_soundid");
+        if (rs.wasNull()) {
+            soundId = null;
+        }
+        row.setSoundId(soundId);
+        return row;
+    }
+
     private AlertSettings parseAlertSettings(byte[] settings) {
         ObjectMapper mapper = JsonMapper.builder().enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION).build();
         try {

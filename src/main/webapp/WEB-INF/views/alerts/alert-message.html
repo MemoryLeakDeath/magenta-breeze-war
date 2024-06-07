@@ -1,5 +1,11 @@
-[#if alertSettings.imageId??]
-	<h1>Asset: ${alertSettings.imageId}</h1>
+[#if alertSettings.alertSound??]
+	<audio autoplay>
+		<source src="[@spring.url '/uploads/' + alertSettings.alertSound.uploadedFilename][/@]" type="${alertSettings.alertSound.contentType!}">
+	</audio>
+[/#if]
+[#if alertSettings.alertImage??]
+	<img src="[@spring.url '/uploads/' + alertSettings.alertImage.uploadedFilename][/@]" 
+         style="margin-left: auto; margin-right: auto; width: 50%; max-width: 300px; max-height: 300px;">
 [/#if]
 <p class="d-flex justify-content-center" 
    style="font-size: ${alertSettings.settings.alertTextSize}; font-weight: bold; color: ${alertSettings.settings.alertTextColor}">

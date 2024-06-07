@@ -23,9 +23,8 @@ import tv.memoryleakdeath.magentabreeze.common.pojo.Asset;
 @Repository
 public class AssetsDao {
     private static final Logger logger = LoggerFactory.getLogger(AssetsDao.class);
-    private static final String[] COLUMNS = { "id", "originalfilename", "contenttype", "description",
-            "created",
-            "updated" };
+    public static final String[] COLUMNS = { "id", "originalfilename", "contenttype", "description",
+            "created", "updated" };
     private static final int PAGE_SIZE = 20;
 
     @Autowired

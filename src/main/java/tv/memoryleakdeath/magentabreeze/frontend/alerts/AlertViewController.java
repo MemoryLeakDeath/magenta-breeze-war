@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import jakarta.servlet.http.HttpServletRequest;
 import tv.memoryleakdeath.magentabreeze.backend.dao.AlertSettingsDao;
 import tv.memoryleakdeath.magentabreeze.backend.service.AlertEventsService;
-import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsRow;
+import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsWithAssets;
 import tv.memoryleakdeath.magentabreeze.frontend.BaseFrontendController;
 
 @Controller
@@ -44,7 +44,7 @@ public class AlertViewController extends BaseFrontendController {
     @GetMapping("/contents/{id}")
     public String viewAlertContents(HttpServletRequest request, Model model, @PathVariable(name = "id") Long id) {
         try {
-            AlertSettingsRow alertSettings = dao.getSettingsById(id);
+            AlertSettingsWithAssets alertSettings = dao.getSettingsWithAssets(id);
             model.addAttribute("alertSettings", alertSettings);
         } catch (Exception e) {
             logger.error("Unable to find alert settings for alert id: " + id, e);

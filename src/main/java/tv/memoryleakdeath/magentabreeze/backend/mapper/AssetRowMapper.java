@@ -23,4 +23,15 @@ public class AssetRowMapper implements RowMapper<Asset> {
         asset.setUpdated(rs.getDate("updated"));
         return asset;
     }
+
+    public Asset mapRowWithPrefix(ResultSet rs, int rowNum, String prefix) throws SQLException {
+        Asset asset = new Asset();
+        asset.setId(rs.getLong(prefix + "_id"));
+        asset.setOriginalFilename(rs.getString(prefix + "_originalfilename"));
+        asset.setContentType(rs.getString(prefix + "_contenttype"));
+        asset.setDescription(rs.getString(prefix + "_description"));
+        asset.setCreated(rs.getDate(prefix + "_created"));
+        asset.setUpdated(rs.getDate(prefix + "_updated"));
+        return asset;
+    }
 }
