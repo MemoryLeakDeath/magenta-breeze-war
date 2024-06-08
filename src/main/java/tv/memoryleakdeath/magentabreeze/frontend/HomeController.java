@@ -15,6 +15,7 @@ public class HomeController extends BaseFrontendController {
     public String home(HttpServletRequest request, Model model) {
         model.addAttribute("hello", "Hello World!");
         request.getSession().setAttribute("testSessionAttrib", "this is a test of a session attribute.");
+        model.addAttribute("clientId", "");
         return "home/home";
     }
 }

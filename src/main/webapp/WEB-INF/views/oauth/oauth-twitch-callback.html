@@ -1,0 +1,11 @@
+<html>
+	<head>
+		<title>OAuth Twitch Callback</title>
+		<script type="text/javascript">
+			window.onload = function () {
+				var fragment = window.location.hash.substring(1);
+				window.location = "/oauth/token?" + fragment;
+			}
+	    </script>
+	</head>	
+</html>
