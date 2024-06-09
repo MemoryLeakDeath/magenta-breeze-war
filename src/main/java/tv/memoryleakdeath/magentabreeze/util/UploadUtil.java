@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import tv.memoryleakdeath.magentabreeze.common.ContentTypeConstants;
 
-public class UploadUtil {
+public final class UploadUtil {
     private static final Logger logger = LoggerFactory.getLogger(UploadUtil.class);
 
     private UploadUtil() {
@@ -45,7 +45,7 @@ public class UploadUtil {
         }
     }
 
-    public static final String getUploadedFilename(Long id, String originalFilename) {
+    public static String getUploadedFilename(Long id, String originalFilename) {
         return id + "_" + originalFilename;
     }
 }

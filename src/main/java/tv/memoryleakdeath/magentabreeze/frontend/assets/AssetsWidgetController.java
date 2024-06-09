@@ -54,7 +54,7 @@ public class AssetsWidgetController extends BaseFrontendController {
             if (page < totalPages) {
                 model.addAttribute("nextPage", page + 1);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             addErrorMessage(request, "text.error.systemerror");
             logger.error("Failed to view assets of type: " + type + " on page: " + page, e);
         }

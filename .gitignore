@@ -18,3 +18,5 @@ buildNumber.properties
 /.settings/
 /node_modules/
 /node/
+/.checkstyle
+/secretkeys.properties

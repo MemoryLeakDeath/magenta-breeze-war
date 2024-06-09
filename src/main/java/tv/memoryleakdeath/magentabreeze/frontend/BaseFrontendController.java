@@ -23,7 +23,7 @@ public class BaseFrontendController {
 
     @Autowired
     @Qualifier("appSourceVersion")
-    String applicationVersion;
+    private String applicationVersion;
 
     @Autowired
     private MessageSource messageSource;

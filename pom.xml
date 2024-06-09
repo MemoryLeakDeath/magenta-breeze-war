@@ -29,6 +29,7 @@
         <velocity.version>2.3</velocity.version>
         <twitch4j.version>1.20.0</twitch4j.version>
         <httpclient.version>5.3.1</httpclient.version>
+        <skipcertimport>false</skipcertimport>
   </properties>
     <dependencyManagement>
         <dependencies>
@@ -492,6 +493,7 @@
 			                <file>${project.basedir}/conf/localhost_root_ca.crt</file>
 			                <trustcacerts>true</trustcacerts>
 			                <noprompt>true</noprompt>
+			                <skip>${skipcertimport}</skip>
 			            </configuration>
 			        </execution>
                 </executions>
@@ -560,4 +562,51 @@
 			</plugin>
         </plugins>
     </build>
+    <profiles>
+		<profile>
+            <id>init-dev</id>
+			<activation>
+				<file>
+					<missing>src/main/resources/resources.db</missing>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>3.3.0</version>
+						<executions>
+							<execution>
+								<id>init-resource-db</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>java</goal>									
+								</goals>
+								<configuration>
+									<mainClass>tv.memoryleakdeath.magentabreeze.build.BuildResourceStore</mainClass>
+									<arguments>
+										<argument>${project.basedir}/secretkeys.properties</argument>
+										<argument>${project.basedir}/src/main/resources/resources.db</argument>
+										<argument>${project.basedir}/src/main/resources/index.mstore</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>			
+			</build>
+        </profile>
+        <profile>
+            <id>certs-already-inited</id>
+            <activation>
+				<file>
+                    <exists>conf/localhost_mb_server.crt</exists>                   
+                </file>
+			</activation>
+			<properties>
+				<skipcertimport>true</skipcertimport>
+			</properties>
+		</profile>
+	</profiles>
 </project>
