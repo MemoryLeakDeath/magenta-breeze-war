@@ -10,7 +10,7 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td>&nbsp;</td>
-				<td>[@spring.message "label.service"][/@]</td>
+				<td>(Account)[@spring.message "label.service"][/@]</td>
 				<td>[@spring.message "label.alerttype"][/@]</td>
 				<td>[@spring.message "label.updated"][/@]</td>
 			</tr>
@@ -25,7 +25,7 @@
 					[@mb.buttonIcon "deleteButton-${setting.id}" "fa-trash" "fas" "button.delete" "btn-sm" 'data-id="'?no_esc + setting.id?no_esc + '"'?no_esc][/@]
 					[@mb.buttonLinkNoText id="testButton-${setting.id}" titleLookup="button.testalert" url="/settings/alerts/test/${setting.id}" icon="fa-check" iconType="fas" extraClass="btn-sm"][/@]
 			    </td>
-				<td style="width: 100px;">[@mb.serviceIcon serviceName="${setting.service}"][/@]</tdstyle="max-width: 100px;">
+				<td style="width: 100px;"></td>
 				<td>[@spring.message 'text.alerts.alerttypes.' + setting.type][/@]</td>
 				<td>${setting.updated}</td>
 			</tr>

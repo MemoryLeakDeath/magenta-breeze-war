@@ -22,7 +22,7 @@ import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsWithAssets;
 @Repository
 public class AlertSettingsDao {
     private static final Logger logger = LoggerFactory.getLogger(AlertSettingsDao.class);
-    private static final String[] COLUMNS = { "id", "service", "type", "active", "settings", "imageid", "soundid",
+    private static final String[] COLUMNS = { "id", "type", "active", "settings", "imageid", "soundid",
             "created", "updated" };
 
     @Autowired
@@ -38,7 +38,7 @@ public class AlertSettingsDao {
 
     @Transactional
     public boolean createSettings(AlertSettingsRow newSettings) {
-        String sql = "insert into alertsettings (service, type, active, settings, imageid, soundid, created, updated) values (?,?,?,? FORMAT JSON,?,?,?,?)";
+        String sql = "insert into alertsettings (type, active, settings, imageid, soundid, created, updated) values (?,?,? FORMAT JSON,?,?,?,?)";
         String jsonSettings = "";
         try {
             jsonSettings = new ObjectMapper().writeValueAsString(newSettings.getSettings());
@@ -47,9 +47,8 @@ public class AlertSettingsDao {
             return false;
         }
         Date createdDate = new Date();
-        int rowsAffected = jdbcTemplate.update(sql, newSettings.getService().name(),
-                newSettings.getType().toString(), newSettings.isActive(), jsonSettings, newSettings.getImageId(),
-                newSettings.getSoundId(), createdDate, createdDate);
+        int rowsAffected = jdbcTemplate.update(sql, newSettings.getType().toString(), newSettings.isActive(),
+                jsonSettings, newSettings.getImageId(), newSettings.getSoundId(), createdDate, createdDate);
         return (rowsAffected > 0);
     }
 
@@ -71,7 +70,7 @@ public class AlertSettingsDao {
 
     @Transactional
     public boolean updateSettings(AlertSettingsRow row) {
-        String sql = "update alertsettings set service = ?, type = ?, settings = ? FORMAT JSON, imageid = ?, soundid = ?, updated = CURRENT_TIMESTAMP() where id = ?";
+        String sql = "update alertsettings set type = ?, settings = ? FORMAT JSON, imageid = ?, soundid = ?, updated = CURRENT_TIMESTAMP() where id = ?";
         String jsonSettings = "";
         if (row.getSettings() != null) {
             try {
@@ -81,7 +80,7 @@ public class AlertSettingsDao {
                 return false;
             }
         }
-        int rowsAffected = jdbcTemplate.update(sql, row.getService().name(), row.getType().toString(), jsonSettings,
+        int rowsAffected = jdbcTemplate.update(sql, row.getType().toString(), jsonSettings,
                 row.getImageId(), row.getSoundId(), row.getId());
         return (rowsAffected > 0);
     }

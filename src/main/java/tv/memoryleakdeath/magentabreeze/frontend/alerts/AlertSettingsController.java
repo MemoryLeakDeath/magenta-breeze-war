@@ -20,11 +20,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletRequest;
 import tv.memoryleakdeath.magentabreeze.backend.dao.AlertSettingsDao;
+import tv.memoryleakdeath.magentabreeze.backend.service.AlertSettingsService;
 import tv.memoryleakdeath.magentabreeze.common.AlertTypeConstants;
 import tv.memoryleakdeath.magentabreeze.common.ServiceTypes;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertEventPayload;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettings;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsRow;
+import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsWithAssets;
 import tv.memoryleakdeath.magentabreeze.frontend.BaseFrontendController;
 
 @Controller
@@ -36,6 +38,9 @@ public class AlertSettingsController extends BaseFrontendController {
     private AlertSettingsDao settingsDao;
 
     @Autowired
+    private AlertSettingsService alertSettingsService;
+
+    @Autowired
     private AlertSettingsValidator<AlertSettingsModel> settingsValidator;
 
     @Autowired
@@ -45,10 +50,10 @@ public class AlertSettingsController extends BaseFrontendController {
     public String view(HttpServletRequest request, Model model) {
         setPageTitle(request, model, "text.alerts.title");
         try {
-            List<AlertSettingsRow> allSettings = settingsDao.getAllSettings();
+            List<AlertSettingsRow> allSettings = alertSettingsService.getAllSettingsWithAccounts();
             model.addAttribute("allSettings", allSettings);
         } catch (Exception e) {
-            logger.error("Unable to fetch all settings!");
+            logger.error("Unable to fetch all settings!", e);
             addErrorMessage(request, "text.error.systemerror");
         }
         return "settings/alerts/alerts";
@@ -94,7 +99,6 @@ public class AlertSettingsController extends BaseFrontendController {
     private AlertSettingsRow buildSettingsObject(AlertSettingsModel model) {
         AlertSettingsRow row = new AlertSettingsRow();
         row.setActive(true);
-        row.setService(ServiceTypes.valueOf(model.getService()));
         row.setType(AlertTypeConstants.getType(model.getType()));
         row.setImageId(model.getAlertImageId());
         row.setSoundId(model.getAlertSoundId());
@@ -126,9 +130,8 @@ public class AlertSettingsController extends BaseFrontendController {
         setPageTitle(request, model, "text.alerts.edit.title");
         try {
             if (!model.containsAttribute("alertSettingsModel")) {
-                AlertSettingsRow settings = settingsDao.getSettingsById(id);
+                AlertSettingsWithAssets settings = alertSettingsService.getSettingsWithAssetsAndAccounts(id);
                 model.addAttribute("alertSettingsModel", buildModelObject(settings));
-                model.addAttribute("service", settings.getService());
             }
         } catch (Exception e) {
             addErrorMessage(request, "text.error.systemerror");
@@ -139,18 +142,18 @@ public class AlertSettingsController extends BaseFrontendController {
         return "settings/alerts/alerts-edit";
     }
 
-    private AlertSettingsModel buildModelObject(AlertSettingsRow row) {
+    private AlertSettingsModel buildModelObject(AlertSettingsWithAssets row) {
         AlertSettingsModel model = new AlertSettingsModel();
         if (row.getSettings() != null) {
             model.setAlertText(row.getSettings().getAlertText());
             model.setAlertTextColor(row.getSettings().getAlertTextColor());
             model.setAlertTextSize(row.getSettings().getAlertTextSize());
         }
-        model.setService(row.getService().name());
         model.setType(row.getType().toString());
         model.setId(row.getId());
         model.setAlertImageId(row.getImageId());
         model.setAlertSoundId(row.getSoundId());
+        model.setAccounts(row.getAccounts());
         return model;
     }
 

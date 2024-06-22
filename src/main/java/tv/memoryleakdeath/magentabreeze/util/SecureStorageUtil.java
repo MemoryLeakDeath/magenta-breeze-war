@@ -27,6 +27,11 @@ public final class SecureStorageUtil {
         SecureRandom random = new SecureRandom();
         byte[] key = new byte[KEY_LENGTH];
         random.nextBytes(key);
+        for (byte b : key) {
+            if (b == 0x20) {
+                b += random.nextInt(50); // passwords should not contain spaces
+            }
+        }
         return new String(key);
     }
 

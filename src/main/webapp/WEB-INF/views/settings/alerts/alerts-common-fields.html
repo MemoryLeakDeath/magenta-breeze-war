@@ -1,7 +1,7 @@
 [#assign typesLookupUrl]
 	[@spring.url "/settings/alerts/types"][/@]
 [/#assign]
-[@mb.inputSelectEnum "alert-settings-service" "service" "alertSettingsModel" "label.alerts.service" serviceTypes "text.alerts.servicetypes." 'hx-post="'?no_esc + typesLookupUrl?no_esc + '" hx-target="#alert-settings-type-div" hx-trigger="change" hx-swap="outerHTML"'?no_esc ][/@]
+Account Dropdown:
 [#include "alerts-types-ajax.html"]
 [@mb.inputText "alert-text" "alertText" "alertSettingsModel" "label.alerts.alerttext" true][/@]
 [@mb.inputText "alert-text-color" "alertTextColor" "alertSettingsModel" "label.alerts.alerttextcolor" true][/@]

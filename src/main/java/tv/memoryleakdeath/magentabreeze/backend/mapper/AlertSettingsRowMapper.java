@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import tv.memoryleakdeath.magentabreeze.common.AlertTypeConstants;
-import tv.memoryleakdeath.magentabreeze.common.ServiceTypes;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettings;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsRow;
 
@@ -26,7 +25,6 @@ public class AlertSettingsRowMapper extends BaseMapper implements RowMapper<Aler
         AlertSettingsRow row = new AlertSettingsRow();
         row.setActive(rs.getBoolean("active"));
         row.setId(rs.getLong("id"));
-        row.setService(getEnumTypeFromString(rs.getString("service"), ServiceTypes.class));
         row.setSettings(parseAlertSettings(rs.getBytes("settings")));
         row.setType(AlertTypeConstants.getType(rs.getString("type")));
         row.setCreated(rs.getTimestamp("created"));
@@ -48,7 +46,6 @@ public class AlertSettingsRowMapper extends BaseMapper implements RowMapper<Aler
         AlertSettingsRow row = new AlertSettingsRow();
         row.setActive(rs.getBoolean(prefix + "_active"));
         row.setId(rs.getLong(prefix + "_id"));
-        row.setService(getEnumTypeFromString(rs.getString(prefix + "_service"), ServiceTypes.class));
         row.setSettings(parseAlertSettings(rs.getBytes(prefix + "_settings")));
         row.setType(AlertTypeConstants.getType(rs.getString(prefix + "_type")));
         row.setCreated(rs.getTimestamp(prefix + "_created"));

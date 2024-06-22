@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import jakarta.servlet.http.HttpServletRequest;
-import tv.memoryleakdeath.magentabreeze.backend.dao.AlertSettingsDao;
 import tv.memoryleakdeath.magentabreeze.backend.service.AlertEventsService;
+import tv.memoryleakdeath.magentabreeze.backend.service.AlertSettingsService;
 import tv.memoryleakdeath.magentabreeze.common.pojo.AlertSettingsWithAssets;
 import tv.memoryleakdeath.magentabreeze.frontend.BaseFrontendController;
 
@@ -23,10 +23,10 @@ public class AlertViewController extends BaseFrontendController {
     private static final Logger logger = LoggerFactory.getLogger(AlertViewController.class);
 
     @Autowired
-    private AlertSettingsDao dao;
+    private AlertEventsService eventsService;
 
     @Autowired
-    private AlertEventsService eventsService;
+    private AlertSettingsService alertSettingsService;
 
     @GetMapping("/view/{id}")
     public String view(HttpServletRequest request, Model model, @PathVariable(name = "id") Long id) {
@@ -44,7 +44,7 @@ public class AlertViewController extends BaseFrontendController {
     @GetMapping("/contents/{id}")
     public String viewAlertContents(HttpServletRequest request, Model model, @PathVariable(name = "id") Long id) {
         try {
-            AlertSettingsWithAssets alertSettings = dao.getSettingsWithAssets(id);
+            AlertSettingsWithAssets alertSettings = alertSettingsService.getSettingsWithAssetsAndAccounts(id);
             model.addAttribute("alertSettings", alertSettings);
         } catch (Exception e) {
             logger.error("Unable to find alert settings for alert id: " + id, e);
