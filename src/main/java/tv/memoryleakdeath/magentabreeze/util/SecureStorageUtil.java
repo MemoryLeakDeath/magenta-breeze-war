@@ -13,12 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ResourceLoader;
 
+import tv.memoryleakdeath.magentabreeze.common.ServiceTypes;
+
 public final class SecureStorageUtil {
     private static final Logger logger = LoggerFactory.getLogger(SecureStorageUtil.class);
     private static final String STORAGE_FILE = "resources.db";
     private static final String KEY_FILE = "classpath:index.mstore";
     private static final int KEY_LENGTH = 64;
     private static final int CODE_POINT = 0x301;
+    private static final String OAUTH_TOKEN_MAP_NAME = "tokens";
 
     private SecureStorageUtil() {
     }
@@ -46,6 +49,14 @@ public final class SecureStorageUtil {
         return null;
     }
 
+    private static String getResourceFilePath(ResourceLoader loader) throws IOException {
+        return loader.getResource("classpath:" + STORAGE_FILE).getURL().getPath();
+    }
+
+    private static MVStore getMVStore(String resourcePath, String currentKey) {
+        return new MVStore.Builder().fileName(resourcePath).encryptionKey(currentKey.toCharArray()).compress().open();
+    }
+
     public static void rotateSecureStorage(ResourceLoader loader) {
         String rotatedKey = generateKey();
         String oldKey = getCurrentKey(loader);
@@ -54,7 +65,7 @@ public final class SecureStorageUtil {
             return;
         }
         try {
-            String resourcePath = loader.getResource("classpath:" + STORAGE_FILE).getURL().getPath();
+            String resourcePath = getResourceFilePath(loader);
             ChangeFileEncryption.execute(resourcePath, STORAGE_FILE, "AES", oldKey.toCharArray(),
                     rotatedKey.toCharArray(), true);
             storeKeyToFile(loader, rotatedKey, KEY_FILE);
@@ -76,15 +87,42 @@ public final class SecureStorageUtil {
     public static String getValueFromSecureStorage(String mapName, String key, ResourceLoader loader) {
         String value = null;
         try {
-            String currentKey = getCurrentKey(loader);
-            String resourcePath = loader.getResource("classpath:" + STORAGE_FILE).getURL().getPath();
-            MVStore store = new MVStore.Builder().fileName(resourcePath).encryptionKey(currentKey.toCharArray())
-                    .compress().open();
+            MVStore store = getMVStore(getResourceFilePath(loader), getCurrentKey(loader));
             MVMap<String, String> storedValues = store.openMap(mapName);
             value = storedValues.get(key);
             store.close();
         } catch (Exception e) {
             logger.error("Failed to read value from secure storage!", e);
+        }
+        return value;
+    }
+
+    public static boolean saveOAuthTokenInSecureStorage(String token, String tokenType, ServiceTypes service, int accountId,
+            ResourceLoader loader) {
+        boolean success = false;
+        try {
+            MVStore store = getMVStore(getResourceFilePath(loader), getCurrentKey(loader));
+            MVMap<String, String> storedTokens = store.openMap(OAUTH_TOKEN_MAP_NAME);
+            storedTokens.put("%s_%s_%d".formatted(service.name(), tokenType, accountId), token);
+            logger.debug("Storing token for account: {}", "%s_%s_%d".formatted(service.name(), tokenType, accountId));
+            store.close();
+            success = true;
+        } catch (Exception e) {
+            logger.error("Failed to open secure storage to save new value!", e);
+        }
+        return success;
+    }
+
+    public static String getOAuthTokenFromSecureStorage(ServiceTypes service, String tokenType, int accountId,
+            ResourceLoader loader) {
+        String value = null;
+        try {
+            MVStore store = getMVStore(getResourceFilePath(loader), getCurrentKey(loader));
+            MVMap<String, String> storedTokens = store.openMap(OAUTH_TOKEN_MAP_NAME);
+            value = storedTokens.get("%s_%s_%d".formatted(service.name(), tokenType, accountId));
+            store.close();
+        } catch (Exception e) {
+            logger.error("Unable to open secure storage to retrieve value!", e);
         }
         return value;
     }

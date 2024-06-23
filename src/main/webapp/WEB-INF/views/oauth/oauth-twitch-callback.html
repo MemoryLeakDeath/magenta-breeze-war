@@ -4,8 +4,22 @@
 		<script type="text/javascript">
 			window.onload = function () {
 				var fragment = window.location.hash.substring(1);
-				window.location = "/oauth/token?" + fragment;
+				var params = new URLSearchParams(fragment);
+				document.getElementById("access_token").value = params.get("access_token");
+				document.getElementById("scope").value = params.get("scope");
+				document.getElementById("state").value = params.get("state");
+				document.getElementById("token_type").value = params.get("token_type");
+				document.getElementById("oauth-submit").submit();
 			}
-	    </script>
+	    </script>	    
 	</head>	
+	<body>
+		<form id="oauth-submit" action="[@spring.url "/settings/accounts/create"][/@]" method="POST" accept-charset="UTF-8">
+			<input type="hidden" id="access_token" name="access_token" value="">
+			<input type="hidden" id="scope" name="scope" value="">
+			<input type="hidden" id="state" name="state" value="">
+			<input type="hidden" id="token_type" name="token_type" value="">
+			<input type="hidden" id="service" name="service" value="TWITCH">
+		</form>
+	</body>
 </html>

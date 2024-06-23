@@ -1,6 +1,5 @@
 package tv.memoryleakdeath.magentabreeze.frontend.oauth;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -28,18 +27,5 @@ public class TwitchOAuthCallbackController extends BaseFrontendController {
             return "redirect:/";
         }
         return "oauth/oauth-twitch-callback";
-    }
-
-    @GetMapping("/token")
-    public String parseToken(HttpServletRequest request, Model model,
-            @RequestParam(name = "access_token", required = true) String accessToken,
-            @RequestParam(name = "scope", required = true) String scope,
-            @RequestParam(name = "state", required = false) String state,
-            @RequestParam(name = "token_type", required = true) String tokenType) {
-        if (StringUtils.isNotBlank(accessToken)) {
-            logger.debug("Token received!");
-            addSuccessMessage(request, "text.oauth.twitch.success");
-        }
-        return "redirect:/";
     }
 }

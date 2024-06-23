@@ -1,5 +1,7 @@
 package tv.memoryleakdeath.magentabreeze.backend.dao;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -7,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,8 +20,8 @@ import tv.memoryleakdeath.magentabreeze.common.pojo.Account;
 @Repository
 public class AccountsDao {
     private static final Logger logger = LoggerFactory.getLogger(AccountsDao.class);
-    private static final String[] COLUMNS = { "id", "service", "chatonly", "statekey", "created", "updated",
-            "displayname", "statekeyexpired", "profileurl" };
+    private static final String[] COLUMNS = { "id", "service", "chatonly", "created", "updated", "displayname",
+            "profileurl" };
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -54,10 +58,21 @@ public class AccountsDao {
 
     @Transactional
     public boolean createAccount(Account account) {
-        String sql = "insert into accounts (service, chatonly, statekey, created, updated, displayname, statekeyexpired, profileurl) values (?,?,?,CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP(),?,?,?)";
-        int rowsAffected = jdbcTemplate.update(sql, account.getService(), account.isChatOnly(), account.getStateKey(),
-                account.getDisplayName(), account.isStateKeyExpired(), account.getProfileUrl());
-        return (rowsAffected > 0);
+        String sql = "insert into accounts (service, chatonly, created, updated, displayname, profileurl) values (?,?,CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP(),?,?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        int rowsAffected = jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, account.getService());
+            ps.setBoolean(2, account.isChatOnly());
+            ps.setString(3, account.getDisplayName());
+            ps.setString(4, account.getProfileUrl());
+            return ps;
+        }, keyHolder);
+        if (rowsAffected > 0) {
+            account.setId(keyHolder.getKey().longValue());
+            return true;
+        }
+        return false;
     }
 
     @Transactional
@@ -69,9 +84,9 @@ public class AccountsDao {
 
     @Transactional
     public boolean updateAccount(Account account) {
-        String sql = "update accounts set service = ?, chatonly = ?, statekey = ?, updated = CURRENT_TIMESTAMP(), displayname = ?, statekeyexpired = ?, profileurl = ? where id = ?";
-        int rowsAffected = jdbcTemplate.update(sql, account.getService(), account.isChatOnly(), account.getStateKey(),
-                account.getDisplayName(), account.isStateKeyExpired(), account.getProfileUrl(), account.getId());
+        String sql = "update accounts set service = ?, chatonly = ?, updated = CURRENT_TIMESTAMP(), displayname = ?, profileurl = ? where id = ?";
+        int rowsAffected = jdbcTemplate.update(sql, account.getService(), account.isChatOnly(),
+                account.getDisplayName(), account.getProfileUrl(), account.getId());
         return (rowsAffected > 0);
     }
 

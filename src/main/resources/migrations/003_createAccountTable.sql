@@ -19,8 +19,6 @@ create table if not exists accounts
 	displayname varchar(100) not null,
 	profileurl varchar(500) not null,
 	chatonly boolean not null default false,
-	statekey varchar(50) not null,
-	statekeyexpired boolean not null default false,
 	created timestamp with time zone not null,
 	updated timestamp with time zone not null
 )

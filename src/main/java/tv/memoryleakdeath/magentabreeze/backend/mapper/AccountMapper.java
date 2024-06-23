@@ -15,11 +15,9 @@ public class AccountMapper implements RowMapper<Account> {
         account.setId(rs.getLong("id"));
         account.setService(rs.getString("service"));
         account.setChatOnly(rs.getBoolean("chatonly"));
-        account.setStateKey(rs.getString("statekey"));
         account.setCreated(rs.getDate("created"));
         account.setUpdated(rs.getDate("updated"));
         account.setDisplayName(rs.getString("displayname"));
-        account.setStateKeyExpired(rs.getBoolean("statekeyexpired"));
         account.setProfileUrl(rs.getString("profileurl"));
         return account;
     }

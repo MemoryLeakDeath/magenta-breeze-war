@@ -9,11 +9,9 @@ public class Account implements Serializable {
     private Long id;
     private String service;
     private boolean chatOnly;
-    private String stateKey;
     private Date created;
     private Date updated;
     private String displayName;
-    private boolean stateKeyExpired;
     private String profileUrl;
 
     public Long getId() {
@@ -40,14 +38,6 @@ public class Account implements Serializable {
         this.chatOnly = chatOnly;
     }
 
-    public String getStateKey() {
-        return stateKey;
-    }
-
-    public void setStateKey(String stateKey) {
-        this.stateKey = stateKey;
-    }
-
     public Date getCreated() {
         return created;
     }
@@ -70,14 +60,6 @@ public class Account implements Serializable {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
-    }
-
-    public boolean isStateKeyExpired() {
-        return stateKeyExpired;
-    }
-
-    public void setStateKeyExpired(boolean stateKeyExpired) {
-        this.stateKeyExpired = stateKeyExpired;
     }
 
     public String getProfileUrl() {
