@@ -30,7 +30,7 @@ public class MagentaBreezeInit implements WebApplicationInitializer {
         servletContext.setInitParameter("db.url", MagentaBreezeDBConfig.DB_URL);
         servletContext.setInitParameter("db.user", "mb");
         servletContext.setInitParameter("db.password", "");
-        servletContext.setInitParameter("db.tcpServer", "-tcpAllowOthers");
+        servletContext.setInitParameter("db.tcpServer", "-tcp -tcpAllowOthers -ifNotExists");
         servletContext.addListener(new JakartaDbStarter());
 
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher",
