@@ -23,15 +23,15 @@ public class MagentaBreezeInit implements WebApplicationInitializer {
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
         rootContext.scan("tv.memoryleakdeath.magentabreeze.conf");
 
-        servletContext.addListener(new ContextLoaderListener(rootContext));
-        servletContext.addFilter("characterEncodingFilter", new CharacterEncodingFilter("UTF-8", true))
-                .addMappingForUrlPatterns(null, true, "/*");
-
         servletContext.setInitParameter("db.url", MagentaBreezeDBConfig.DB_URL);
         servletContext.setInitParameter("db.user", "mb");
         servletContext.setInitParameter("db.password", "");
-        servletContext.setInitParameter("db.tcpServer", "-tcp -tcpAllowOthers -ifNotExists");
+        servletContext.setInitParameter("db.tcpServer", "-tcpAllowOthers -ifNotExists");
         servletContext.addListener(new JakartaDbStarter());
+
+        servletContext.addListener(new ContextLoaderListener(rootContext));
+        servletContext.addFilter("characterEncodingFilter", new CharacterEncodingFilter("UTF-8", true))
+                .addMappingForUrlPatterns(null, true, "/*");
 
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher",
                 new DispatcherServlet(rootContext));

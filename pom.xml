@@ -29,7 +29,6 @@
         <velocity.version>2.3</velocity.version>
         <twitch4j.version>1.20.0</twitch4j.version>
         <httpclient.version>5.3.1</httpclient.version>
-        <skipcertimport>false</skipcertimport>
   </properties>
     <dependencyManagement>
         <dependencies>
@@ -407,159 +406,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>keytool-maven-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-					<execution>
-				      <id>generate-root-cert</id>
-					  <goals>
-					    <goal>generateKeyPair</goal>
-					  </goals>
-					  <phase>generate-resources</phase>
-						<configuration>
-						  <keystore>${project.basedir}/conf/localhost_mb_root_keystore.jks</keystore>
-						  <storepass>changeit</storepass>
-						  <keypass>changeit</keypass>
-						  <alias>rootCA</alias>
-						  <dname>cn=localhost, ou=Root CA, L=Philadelphia, ST=PA, o=MagentaBreezeCA, c=US</dname>
-						  <validity>3650</validity>
-						  <keyalg>RSA</keyalg>
-						  <keysize>2048</keysize>
-						  <sigalg>SHA256withRSA</sigalg>
-						  <exts>SubjectAlternativeName=DNS:localhost</exts>
-						  <skipIfExist>true</skipIfExist>
-						</configuration>
-					</execution>
-			        <execution>
-			            <id>export-root-ca</id>
-			            <goals>
-			                <goal>exportCertificate</goal>
-			            </goals>
-			            <phase>generate-resources</phase>
-			            <configuration>
-			                <keystore>${project.basedir}/conf/localhost_mb_root_keystore.jks</keystore>
-			                <storepass>changeit</storepass>
-			                <alias>rootCA</alias>
-			                <file>${project.basedir}/conf/localhost_root_ca.crt</file>
-			            </configuration>
-			        </execution>
-					<execution>
-					  <id>generate-server-cert</id>
-					  <goals>
-					    <goal>generateKeyPair</goal>
-					  </goals>
-					  <phase>generate-resources</phase>
-						<configuration>
-						  <keystore>${project.basedir}/conf/localhost_mb_server_keystore.jks</keystore>
-						  <storepass>changeit</storepass>
-						  <keypass>changeit</keypass>
-						  <alias>server</alias>
-						  <dname>cn=localhost, ou=Server Cert, L=Philadelphia, ST=PA, o=MagentaBreezeServer, c=US</dname>
-						  <validity>3650</validity>
-						  <keyalg>RSA</keyalg>
-						  <keysize>2048</keysize>
-						  <sigalg>SHA256withRSA</sigalg>
-						  <exts>SubjectAlternativeName=DNS:localhost</exts>
-						  <skipIfExist>true</skipIfExist>
-						</configuration>
-					</execution>
-					<execution>
-					    <id>generate-csr</id>
-					    <goals>
-					        <goal>generateCertificateRequest</goal>
-					    </goals>
-					    <phase>generate-resources</phase>
-					    <configuration>
-					        <keystore>${project.basedir}/conf/localhost_mb_server_keystore.jks</keystore>
-					        <storepass>changeit</storepass>
-					        <alias>server</alias>
-					        <dname>cn=localhost, ou=Server Certificate, L=Philadelphia, ST=PA, o=MagentaBreeze, c=US</dname>
-					        <sigalg>SHA256withRSA</sigalg>
-					        <file>${project.basedir}/conf/localhost_mb_server.csr</file>
-					    </configuration>
-					</execution>
-			        <execution>
-			            <id>import-root-ca-to-server-keystore</id>
-			            <goals>
-			                <goal>importCertificate</goal>
-			            </goals>
-			            <phase>generate-resources</phase>
-			            <configuration>
-			                <keystore>${project.basedir}/conf/localhost_mb_server_keystore.jks</keystore>
-			                <storepass>changeit</storepass>
-			                <alias>rootCA</alias>
-			                <file>${project.basedir}/conf/localhost_root_ca.crt</file>
-			                <trustcacerts>true</trustcacerts>
-			                <noprompt>true</noprompt>
-			                <skip>${skipcertimport}</skip>
-			            </configuration>
-			        </execution>
-                </executions>
-            </plugin>
-			<plugin>
-			    <groupId>org.codehaus.mojo</groupId>
-			    <artifactId>exec-maven-plugin</artifactId>
-			    <version>3.3.0</version>
-			    <executions>
-			        <execution>
-			            <id>sign-server-certificate</id>
-			            <phase>generate-resources</phase>
-			            <goals>
-			                <goal>exec</goal>
-			            </goals>
-			            <configuration>
-			                <executable>keytool</executable>
-			                <arguments>
-			                    <argument>-gencert</argument>
-			                    <argument>-alias</argument>
-			                    <argument>rootCA</argument>
-			                    <argument>-infile</argument>
-			                    <argument>${project.basedir}/conf/localhost_mb_server.csr</argument>
-			                    <argument>-outfile</argument>
-			                    <argument>${project.basedir}/conf/localhost_mb_server.crt</argument>
-			                    <argument>-keystore</argument>
-			                    <argument>${project.basedir}/conf/localhost_mb_root_keystore.jks</argument>
-			                    <argument>-storepass</argument>
-			                    <argument>changeit</argument>
-			                    <argument>-ext</argument>
-			                    <argument>BasicConstraints:critical=ca:false</argument>
-			                    <argument>-ext</argument>
-			                    <argument>KeyUsage:critical=keyEncipherment,digitalSignature</argument>
-			                    <argument>-ext</argument>
-			                    <argument>ExtendedKeyUsage=serverAuth</argument>
-			                    <argument>-ext</argument>
-			                    <argument>SubjectAlternativeName=DNS:localhost</argument>
-			                    <argument>-rfc</argument>
-			                </arguments>
-			            </configuration>
-			        </execution>
-			        <execution>
-			            <id>import-server-certificate</id>
-			            <phase>generate-resources</phase>
-			            <goals>
-			                <goal>exec</goal>
-			            </goals>
-			            <configuration>
-			                <executable>keytool</executable>
-			                <arguments>
-			                    <argument>-importcert</argument>
-			                    <argument>-alias</argument>
-			                    <argument>server</argument>
-			                    <argument>-trustcacerts</argument>
-			                    <argument>-file</argument>
-			                    <argument>${project.basedir}/conf/localhost_mb_server.crt</argument>
-			                    <argument>-keystore</argument>
-			                    <argument>${project.basedir}/conf/localhost_mb_server_keystore.jks</argument>
-			                    <argument>-storepass</argument>
-			                    <argument>changeit</argument>
-			                    <argument>-noprompt</argument>
-			                </arguments>
-			            </configuration>
-			        </execution>
-			    </executions>
-			</plugin>
         </plugins>
     </build>
     <profiles>
@@ -597,16 +443,5 @@
 				</plugins>			
 			</build>
         </profile>
-        <profile>
-            <id>certs-already-inited</id>
-            <activation>
-				<file>
-                    <exists>conf/localhost_mb_server.crt</exists>                   
-                </file>
-			</activation>
-			<properties>
-				<skipcertimport>true</skipcertimport>
-			</properties>
-		</profile>
 	</profiles>
 </project>
