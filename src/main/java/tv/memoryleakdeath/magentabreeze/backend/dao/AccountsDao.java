@@ -58,6 +58,9 @@ public class AccountsDao {
 
     @Transactional
     public boolean createAccount(Account account) {
+        if (account == null) {
+            return false;
+        }
         String sql = "insert into accounts (service, chatonly, created, updated, displayname, profileurl) values (?,?,CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP(),?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         int rowsAffected = jdbcTemplate.update(con -> {

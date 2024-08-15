@@ -7,6 +7,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import jakarta.servlet.FilterRegistration;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -30,8 +31,11 @@ public class MagentaBreezeInit implements WebApplicationInitializer {
         servletContext.addListener(new JakartaDbStarter());
 
         servletContext.addListener(new ContextLoaderListener(rootContext));
-        servletContext.addFilter("characterEncodingFilter", new CharacterEncodingFilter("UTF-8", true))
-                .addMappingForUrlPatterns(null, true, "/*");
+
+        FilterRegistration.Dynamic characterEncodingFilter = servletContext.addFilter("characterEncodingFilter",
+                new CharacterEncodingFilter("UTF-8", true));
+        characterEncodingFilter.setAsyncSupported(true);
+        characterEncodingFilter.addMappingForUrlPatterns(null, true, "/*");
 
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher",
                 new DispatcherServlet(rootContext));

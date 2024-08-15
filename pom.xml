@@ -29,6 +29,7 @@
         <velocity.version>2.3</velocity.version>
         <twitch4j.version>1.20.0</twitch4j.version>
         <httpclient.version>5.3.1</httpclient.version>
+        <youtubeapi.version>v3-rev20240514-2.0.0</youtubeapi.version>
   </properties>
     <dependencyManagement>
         <dependencies>
@@ -145,6 +146,11 @@
 		    <artifactId>httpclient5</artifactId>
 		    <version>${httpclient.version}</version>
 		</dependency>	
+		<dependency>
+		    <groupId>com.google.apis</groupId>
+		    <artifactId>google-api-services-youtube</artifactId>
+		    <version>${youtubeapi.version}</version>
+		</dependency>
 				
 		<!-- TEST Dependencies -->
         <dependency>

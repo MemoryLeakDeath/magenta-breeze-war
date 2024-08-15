@@ -22,6 +22,7 @@ public final class SecureStorageUtil {
     private static final int KEY_LENGTH = 64;
     private static final int CODE_POINT = 0x301;
     private static final String OAUTH_TOKEN_MAP_NAME = "tokens";
+    private static final String KEYS_TOKEN_MAP_NAME = "keys";
 
     private SecureStorageUtil() {
     }
@@ -95,6 +96,10 @@ public final class SecureStorageUtil {
             logger.error("Failed to read value from secure storage!", e);
         }
         return value;
+    }
+
+    public static String getValueKeyFromSecureStorage(String key, ResourceLoader loader) {
+        return getValueFromSecureStorage(KEYS_TOKEN_MAP_NAME, key, loader);
     }
 
     public static boolean saveOAuthTokenInSecureStorage(String token, String tokenType, ServiceTypes service, int accountId,

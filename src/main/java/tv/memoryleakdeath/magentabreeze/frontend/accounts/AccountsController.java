@@ -14,16 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.github.twitch4j.TwitchClient;
-import com.github.twitch4j.TwitchClientBuilder;
-import com.github.twitch4j.helix.domain.User;
-import com.github.twitch4j.helix.domain.UserList;
-
 import jakarta.servlet.http.HttpServletRequest;
 import tv.memoryleakdeath.magentabreeze.backend.dao.AccountsDao;
-import tv.memoryleakdeath.magentabreeze.common.ServiceTypes;
-import tv.memoryleakdeath.magentabreeze.common.pojo.Account;
+import tv.memoryleakdeath.magentabreeze.backend.service.AccountService;
 import tv.memoryleakdeath.magentabreeze.frontend.BaseFrontendController;
+import tv.memoryleakdeath.magentabreeze.util.OAuthUtil;
 import tv.memoryleakdeath.magentabreeze.util.SecureStorageUtil;
 
 @Controller
@@ -31,15 +26,22 @@ import tv.memoryleakdeath.magentabreeze.util.SecureStorageUtil;
 public class AccountsController extends BaseFrontendController {
     private static final Logger logger = LoggerFactory.getLogger(AccountsController.class);
     private static final String TWITCH_AUTH_URL_BASE = "https://id.twitch.tv/oauth2/authorize";
-    private static final String AUTH_REDIRECT_URI = "https://localhost:6443/oauth/authenticate";
+    private static final String TWITCH_REDIRECT_URI = "/oauth/authenticate";
     private static final String OAUTH_RESPONSE_TYPE = "token";
     private static final String[] TWITCH_OAUTH_SCOPES = { "user:read:broadcast" };
+    private static final String YT_AUTH_URL_BASE = "https://accounts.google.com/o/oauth2/auth";
+    private static final String YT_OAUTH_RESPONSE_TYPE = "code";
+    private static final String[] YT_OAUTH_SCOPES = { "https://www.googleapis.com/auth/youtube.readonly" };
+    private static final String YT_REDIRECT_URI = "/oauth/yt_authenticate";
 
     @Autowired
     private AccountsDao accountsDao;
 
     @Autowired
     private ResourceLoader resourceLoader;
+
+    @Autowired
+    private AccountService accountService;
 
     @GetMapping("/")
     public String view(HttpServletRequest request, Model model) {
@@ -56,17 +58,29 @@ public class AccountsController extends BaseFrontendController {
     @GetMapping("/linktwitch")
     public String startTwitchAuth(HttpServletRequest request) {
         UUID uuid = UUID.randomUUID();
-        String twitchAuthUrl = buildTwitchAuthUrl(uuid.toString());
+        String twitchAuthUrl = buildTwitchAuthUrl(request, uuid.toString());
         return "redirect:" + twitchAuthUrl;
     }
 
     @GetMapping("/linkyoutube")
     public String startYoutubeAuth(HttpServletRequest request) {
-        // TODO: implement this!
-        addErrorMessage(request, "text.error.systemerror");
-        return "redirect:/settings/accounts/";
+        UUID uuid = UUID.randomUUID();
+        String youtubeAuthUrl = buildYoutubeAuthUrl(request, uuid.toString());
+        return "redirect:" + youtubeAuthUrl;
     }
 
+    /**
+     * Called from the TwitchOAuthController only.
+     * 
+     * @param request
+     * @param model
+     * @param accessToken
+     * @param scope
+     * @param state
+     * @param tokenType
+     * @param service
+     * @return The View
+     */
     @PostMapping("/create")
     public String createAccount(HttpServletRequest request, Model model,
             @RequestParam(name = "access_token", required = true) String accessToken,
@@ -79,22 +93,10 @@ public class AccountsController extends BaseFrontendController {
             addErrorMessage(request, "text.error.systemerror");
         }
         try {
-            Account account = null;
-            ServiceTypes serviceType = ServiceTypes.TWITCH;
-            if (ServiceTypes.TWITCH.name().equals(service)) {
-                User twitchUser = getTwitchLoggedInUser(accessToken);
-                account = buildAccountObject(serviceType, twitchUser);
-            } else if (ServiceTypes.YOUTUBE.name().equals(service)) {
-                // TODO: implement this!
-                serviceType = ServiceTypes.YOUTUBE;
-                logger.debug("YOUTUBE not yet implemented!");
-            }
-            if (!accountsDao.createAccount(account)) {
-                logger.error("Unable to create account for linkage!");
+            boolean createResult = accountService.createAccount(accessToken, service);
+            if (!createResult) {
                 addErrorMessage(request, "text.error.systemerror");
             } else {
-                SecureStorageUtil.saveOAuthTokenInSecureStorage(accessToken, "access_token", serviceType,
-                        account.getId().intValue(), resourceLoader);
                 addSuccessMessage(request, "text.oauth.success");
             }
         } catch (Exception e) {
@@ -104,23 +106,17 @@ public class AccountsController extends BaseFrontendController {
         return "redirect:/settings/accounts/";
     }
 
-    private String buildTwitchAuthUrl(String state) {
+    private String buildTwitchAuthUrl(HttpServletRequest request, String state) {
+        String redirectUrl = OAuthUtil.buildUrlPath(request, TWITCH_REDIRECT_URI);
         return "%s?client_id=%s&redirect_uri=%s&response_type=%s&scope=%s&state=%s".formatted(TWITCH_AUTH_URL_BASE,
-                SecureStorageUtil.getValueFromSecureStorage("keys", "twitchapikey", resourceLoader), AUTH_REDIRECT_URI,
+                SecureStorageUtil.getValueKeyFromSecureStorage("twitchapikey", resourceLoader), redirectUrl,
                 OAUTH_RESPONSE_TYPE, StringUtils.join(TWITCH_OAUTH_SCOPES, ","), state);
     }
 
-    private User getTwitchLoggedInUser(String accessToken) {
-        TwitchClient twitchClient = TwitchClientBuilder.builder().withEnableHelix(true).build();
-        UserList users = twitchClient.getHelix().getUsers(accessToken, null, null).execute();
-        return users.getUsers().stream().findFirst().orElse(null);
-    }
-
-    private Account buildAccountObject(ServiceTypes service, User twitchUser) {
-        Account account = new Account();
-        account.setService(service.name());
-        account.setDisplayName(twitchUser.getDisplayName());
-        account.setProfileUrl(twitchUser.getProfileImageUrl());
-        return account;
+    private String buildYoutubeAuthUrl(HttpServletRequest request, String state) {
+        String redirectUrl = OAuthUtil.buildUrlPath(request, YT_REDIRECT_URI);
+        return "%s?client_id=%s&redirect_uri=%s&response_type=%s&scope=%s&state=%s".formatted(YT_AUTH_URL_BASE,
+                SecureStorageUtil.getValueKeyFromSecureStorage("youtubeclientid", resourceLoader), redirectUrl,
+                YT_OAUTH_RESPONSE_TYPE, StringUtils.join(YT_OAUTH_SCOPES, ","), state);
     }
 }
