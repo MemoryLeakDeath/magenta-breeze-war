@@ -41,7 +41,7 @@ import tv.memoryleakdeath.magentabreeze.util.SecureStorageUtil;
 @RequestMapping("/oauth")
 public class YoutubeOAuthCallbackController extends BaseFrontendController {
     private static final Logger logger = LoggerFactory.getLogger(YoutubeOAuthCallbackController.class);
-    private static final String TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
+    public static final String TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
     private static final String YT_REDIRECT_URI = "/oauth/yt_authenticate";
 
     @Autowired
@@ -109,7 +109,9 @@ public class YoutubeOAuthCallbackController extends BaseFrontendController {
             if ("invalid_grant".equals(result)) {
                 logger.error("Received 'invalid grant' error from Youtube token exchange!");
             } else {
-                return parseAuthResponse(result);
+                // clean up string
+                String cleanedResult = StringUtils.removeIgnoreCase(result, "\\n");
+                return parseAuthResponse(cleanedResult);
             }
         } catch (IOException e) {
             logger.error("Unable to contact youtube to exchange initial auth token!", e);

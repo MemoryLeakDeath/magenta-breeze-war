@@ -1,5 +1,7 @@
 package tv.memoryleakdeath.magentabreeze.conf;
 
+import java.util.Set;
+
 import org.h2.server.web.JakartaDbStarter;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -12,6 +14,7 @@ import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.SessionTrackingMode;
 
 public class MagentaBreezeInit implements WebApplicationInitializer {
     public static final long MAX_UPLOAD_SIZE = 100L * 1024L * 1024L; // 100MB
@@ -23,6 +26,7 @@ public class MagentaBreezeInit implements WebApplicationInitializer {
     public void onStartup(ServletContext servletContext) throws ServletException {
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
         rootContext.scan("tv.memoryleakdeath.magentabreeze.conf");
+        servletContext.setSessionTrackingModes(Set.of(SessionTrackingMode.COOKIE));
 
         servletContext.setInitParameter("db.url", MagentaBreezeDBConfig.DB_URL);
         servletContext.setInitParameter("db.user", "mb");

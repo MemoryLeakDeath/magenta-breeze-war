@@ -13,7 +13,6 @@ import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
-import com.google.api.client.auth.oauth2.BearerToken;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.Channel;
@@ -82,8 +81,7 @@ public class AccountService {
 
     private boolean createYoutubeLinkedAccount(String accessToken, String refreshToken, Long expiresIn) {
         boolean success = false;
-        Credential cred = new Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(accessToken)
-                .setRefreshToken(refreshToken).setExpiresInSeconds(expiresIn);
+        Credential cred = YoutubeUtil.buildCredential(accessToken, refreshToken, expiresIn, resourceLoader);
         ChannelSnippet youtubeUser = getYoutubeLoggedInUser(cred);
         Account account = buildAccountObject(ServiceTypes.YOUTUBE, youtubeUser);
         if (!accountsDao.createAccount(account)) {

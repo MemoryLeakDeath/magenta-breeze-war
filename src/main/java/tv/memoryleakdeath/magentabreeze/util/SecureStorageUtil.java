@@ -71,7 +71,7 @@ public final class SecureStorageUtil {
                     rotatedKey.toCharArray(), true);
             storeKeyToFile(loader, rotatedKey, KEY_FILE);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to rotate secure storage!", e);
         }
     }
 
@@ -87,11 +87,9 @@ public final class SecureStorageUtil {
 
     public static String getValueFromSecureStorage(String mapName, String key, ResourceLoader loader) {
         String value = null;
-        try {
-            MVStore store = getMVStore(getResourceFilePath(loader), getCurrentKey(loader));
+        try (MVStore store = getMVStore(getResourceFilePath(loader), getCurrentKey(loader))) {
             MVMap<String, String> storedValues = store.openMap(mapName);
             value = storedValues.get(key);
-            store.close();
         } catch (Exception e) {
             logger.error("Failed to read value from secure storage!", e);
         }
@@ -105,11 +103,15 @@ public final class SecureStorageUtil {
     public static boolean saveOAuthTokenInSecureStorage(String token, String tokenType, ServiceTypes service, int accountId,
             ResourceLoader loader) {
         boolean success = false;
-        try {
-            MVStore store = getMVStore(getResourceFilePath(loader), getCurrentKey(loader));
+        String tokenKey = "%s_%s_%d".formatted(service.name(), tokenType, accountId);
+        if (token == null) {
+            logger.error("attempted to save null token value for key: {}", tokenKey);
+            return false;
+        }
+        try (MVStore store = getMVStore(getResourceFilePath(loader), getCurrentKey(loader))) {
             MVMap<String, String> storedTokens = store.openMap(OAUTH_TOKEN_MAP_NAME);
-            storedTokens.put("%s_%s_%d".formatted(service.name(), tokenType, accountId), token);
-            logger.debug("Storing token for account: {}", "%s_%s_%d".formatted(service.name(), tokenType, accountId));
+            storedTokens.put(tokenKey, token);
+            logger.debug("Storing token for account: {}", tokenKey);
             store.close();
             success = true;
         } catch (Exception e) {
@@ -121,8 +123,7 @@ public final class SecureStorageUtil {
     public static String getOAuthTokenFromSecureStorage(ServiceTypes service, String tokenType, int accountId,
             ResourceLoader loader) {
         String value = null;
-        try {
-            MVStore store = getMVStore(getResourceFilePath(loader), getCurrentKey(loader));
+        try (MVStore store = getMVStore(getResourceFilePath(loader), getCurrentKey(loader))) {
             MVMap<String, String> storedTokens = store.openMap(OAUTH_TOKEN_MAP_NAME);
             value = storedTokens.get("%s_%s_%d".formatted(service.name(), tokenType, accountId));
             store.close();

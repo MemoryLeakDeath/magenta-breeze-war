@@ -29,7 +29,7 @@ public class AccountsController extends BaseFrontendController {
     private static final String TWITCH_REDIRECT_URI = "/oauth/authenticate";
     private static final String OAUTH_RESPONSE_TYPE = "token";
     private static final String[] TWITCH_OAUTH_SCOPES = { "user:read:broadcast" };
-    private static final String YT_AUTH_URL_BASE = "https://accounts.google.com/o/oauth2/auth";
+    private static final String YT_AUTH_URL_BASE = "https://accounts.google.com/o/oauth2/v2/auth";
     private static final String YT_OAUTH_RESPONSE_TYPE = "code";
     private static final String[] YT_OAUTH_SCOPES = { "https://www.googleapis.com/auth/youtube.readonly" };
     private static final String YT_REDIRECT_URI = "/oauth/yt_authenticate";
@@ -115,8 +115,10 @@ public class AccountsController extends BaseFrontendController {
 
     private String buildYoutubeAuthUrl(HttpServletRequest request, String state) {
         String redirectUrl = OAuthUtil.buildUrlPath(request, YT_REDIRECT_URI);
-        return "%s?client_id=%s&redirect_uri=%s&response_type=%s&scope=%s&state=%s".formatted(YT_AUTH_URL_BASE,
-                SecureStorageUtil.getValueKeyFromSecureStorage("youtubeclientid", resourceLoader), redirectUrl,
-                YT_OAUTH_RESPONSE_TYPE, StringUtils.join(YT_OAUTH_SCOPES, ","), state);
+        String url = "%s?client_id=%s&redirect_uri=%s&response_type=%s&scope=%s&access_type=offline&prompt=select_account&state=%s"
+                .formatted(
+                YT_AUTH_URL_BASE, SecureStorageUtil.getValueKeyFromSecureStorage("youtubeclientid", resourceLoader),
+                redirectUrl, YT_OAUTH_RESPONSE_TYPE, StringUtils.join(YT_OAUTH_SCOPES, ","), state);
+        return url;
     }
 }
