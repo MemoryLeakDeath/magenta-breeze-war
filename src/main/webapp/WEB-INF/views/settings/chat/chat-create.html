@@ -1,0 +1,16 @@
+[@layout.normal]
+<div class="container">
+	<h1>[@spring.message "text.chat.create"][/@]</h1>
+	<form action="[@spring.url "/settings/chat/savenew"][/@]" method="POST" accept-charset="UTF-8">
+		[#include "chat-common-fields.html"]
+		<span class="mb-4">
+			[@mb.buttonSubmit id="createNewButton" textLookup="button.createnew" icon="fa-save" iconType="fas" extraClass="me-3"][/@]
+			[#assign cancelLink]
+				[@spring.url '/settings/chat/'][/@]
+			[/#assign]
+			[@mb.buttonCancel "button.cancel" cancelLink][/@]						
+		</span>
+	</form>
+</div>
+<script type="text/javascript" src="[@spring.url '/js/chat-settings.js'][/@]"></script>
+[/@]

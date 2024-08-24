@@ -1,0 +1,10 @@
+<html>
+	<head>
+		[#include "/layout/head.html"]
+	</head>
+	<body>
+		<div hx-ext="sse" sse-connect="[@spring.url "/chat/sse"][/@]">
+			[#include 'chat-contents.html']			
+		</div>
+	</body>
+</html>

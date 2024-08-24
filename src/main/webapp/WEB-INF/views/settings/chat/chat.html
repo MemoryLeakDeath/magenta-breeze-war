@@ -1,0 +1,87 @@
+[@layout.normal]
+<div class="container">
+	<h1>[@spring.message "nav.chat"][/@]</h1>
+	<div class="col-12">
+		[@mb.buttonLink id="createNewButton" url="/settings/chat/create" textLookup="button.createnew" icon="fa-plus" iconType="fas" extraClass="mb-4"][/@]
+	</div>
+	<p>[@spring.message "label.currentchatsettings"][/@]:</p>
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>[@spring.message "label.name"][/@]</td>
+				<td>[@spring.message "label.updated"][/@]</td>
+			</tr>
+		</thead>
+		<tbody>
+			[#if allSettings??]
+			[#list allSettings as setting]
+			<tr class="[#if setting.active == false]opacity-50[/#if]">
+				<td style="width: 100px;">[@mb.switchNoLabel name="active" labelLookupOn="label.active" labelLookupOff="label.inactive" value=setting.active?c extra='data-id="'?no_esc + setting.id?no_esc + '"'?no_esc][/@]</td>
+				<td style="width: 200px;">
+					[@mb.buttonIcon "editButton-${setting.id}" "fa-pencil" "fas" "button.edit" "btn-sm" 'data-id="'?no_esc + setting.id?no_esc + '"'?no_esc][/@]
+					[@mb.buttonIcon "deleteButton-${setting.id}" "fa-trash" "fas" "button.delete" "btn-sm" 'data-id="'?no_esc + setting.id?no_esc + '"'?no_esc][/@]
+					[@mb.buttonLinkNoText id="testButton-${setting.id}" titleLookup="button.testchat" url="/settings/chat/test/${setting.id}" icon="fa-check" iconType="fas" extraClass="btn-sm"][/@]
+			    </td>
+				<td style="width: 100px;">${setting.name}</td>
+				<td>${setting.updated}</td>
+			</tr>
+			[/#list]
+			[/#if]
+		</tbody>
+	</table>
+</div>
+<form id="edit-form" action="[@spring.url '/settings/chat/edit'][/@]" method="post" accept-charset="UTF-8">
+	<input type="hidden" name="id" value="">
+</form>
+
+<form id="delete-form" action="[@spring.url '/settings/chat/delete'][/@]" method="post" accept-charset="UTF-8">
+	<input type="hidden" name="id" value="">
+</form>
+
+<script type="text/javascript">
+	$('body').on("click", '[id *= "editButton-"]', doEdit);
+	$('body').on('change', 'input[name="active"]', toggleActive);
+	$('body').on('click', '[id *= "deleteButton-"]', doDelete);
+	
+	function doEdit() {
+		var id = $(this).data('id');
+		$('#edit-form input[name="id"]').val(id);
+		$('#edit-form').submit();
+	}
+	
+	function toggleActive() {
+		var id = $(this).data('id');
+		var closeMsg = "[@spring.message 'button.close'][/@]";
+		var errorMsg = "[@spring.message 'text.error.systemerror'][/@]";
+		var url = "[@spring.url '/settings/chat/toggleactive'][/@]";
+		var activeFlag = $(this).prop('checked');
+		var that = $(this);
+		$.post(url, {"id": id, "active": activeFlag}).done(function() {
+			toggleAlertRowOpacity($(that).closest('tr'), activeFlag);
+		}).fail(function() {
+			$(that).prop('checked', !activeFlag);
+			toggleAlertRowOpacity($(that).closest('tr'), !activeFlag);
+			showErrorMessage(errorMsg, closeMsg);			
+		});
+	}
+	
+	function toggleAlertRowOpacity(row, activeFlag) {
+		if(activeFlag && $(row).hasClass('opacity-50')) {
+			$(row).removeClass('opacity-50');
+		} else if(!activeFlag && !$(row).hasClass('opacity-50')) {
+			$(row).addClass('opacity-50');
+		}
+	}
+		
+	function doDelete() {
+		var id = $(this).data('id');
+		var confirmMsg = "[@spring.message 'text.chat.confirm.delete'][/@]";
+		if(confirm(confirmMsg)) {
+			$('#delete-form input[name="id"]').val(id);
+			$('#delete-form').submit();
+		}
+	}
+</script>
+[/@]
