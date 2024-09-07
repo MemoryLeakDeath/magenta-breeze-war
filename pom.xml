@@ -341,7 +341,7 @@
                                     <include>htmx.min.js.gz</include>
                                 </resource>
                                 <resource>
-                                    <directory>${project.basedir}/node_modules/htmx.org/dist/ext</directory>
+                                    <directory>${project.basedir}/node_modules/htmx-ext-sse</directory>
                                     <include>sse.js</include>
                                 </resource>
                             </resources>

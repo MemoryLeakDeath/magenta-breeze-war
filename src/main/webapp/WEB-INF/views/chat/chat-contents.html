@@ -17,25 +17,30 @@
 		}
 	}
 </style>
-<div id="chatmessage-id" hx-get="[@spring.url "/chat/contents/id"][/@]" hx-trigger="sse:trigger-alert" class="">	
+<div id="chatmessage-id" hx-get="[@spring.url "/chat/contents/${chatSettings.id}"][/@]" hx-trigger="sse:trigger-chat" class="">	
 </div>	
 <script type="text/javascript">
-	$('body').on('htmx:afterSettle', handleSSEEvent);
-	$('#alert-${alertSettings.id}').on('animationend', stopAnimation);
+	$('body').on('htmx:sseMessage', handleSSEEvent);
+	$('#chat-${chatSettings.id}').on('animationend', stopAnimation);
 	
 	function handleSSEEvent(event) {
-		if(event.detail.elt.id == 'alert-${alertSettings.id}') {
-			doAnimation();
-		}
+        let data = JSON.parse(event.detail.data);
+		console.log('Event Payload ID: ' + data.eventId + ' Message: ' + data.chatMessage);
 	}
 	
 	function doAnimation() {
-		console.log("Start animation!");
-		$('#alert-${alertSettings.id}').addClass('animate-alert');
+		$('#chat-${chatSettings.id}').addClass('animate-chat');
 	}
 	
+	function displayChatMessage(message) {
+		let fontSize = "${chatSettings.settings.chatTextSize}";
+		let textColor = "${chatSettings.settings.chatTextColor}";
+		let messageHtml = `<p class="d-flex justify-content-center" 
+			   style="font-size: ; font-weight: bold; color: ">
+			</p>`;
+    }
+	
 	function stopAnimation() {
-		console.log("END animation!");
-		$('#alert-${alertSettings.id}').removeClass('animate-alert');		
+		$('#chat-${chatSettings.id}').removeClass('animate-chat');		
 	}
 </script>
