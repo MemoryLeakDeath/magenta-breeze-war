@@ -1,4 +1,4 @@
-package tv.memoryleakdeath.magentabreeze.conf;
+package tv.memoryleakdeath.magentabreeze.conf.frontend;
 
 import java.util.Locale;
 import java.util.Map;
@@ -59,6 +59,7 @@ public class MagentaBreezeWebConfig implements WebMvcConfigurer {
         FreeMarkerConfigurer config = new FreeMarkerConfigurer();
         config.setTemplateLoaderPath("/WEB-INF/views/");
         config.setFreemarkerSettings(freemarkerSettings());
+        config.setDefaultEncoding("UTF-8");
         return config;
     }
 

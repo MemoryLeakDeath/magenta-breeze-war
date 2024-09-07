@@ -2,7 +2,6 @@ package tv.memoryleakdeath.magentabreeze.conf;
 
 import java.util.Set;
 
-import org.h2.server.web.JakartaDbStarter;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -15,6 +14,8 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRegistration;
 import jakarta.servlet.SessionTrackingMode;
+import tv.memoryleakdeath.magentabreeze.conf.backend.MagentaBreezeDBConfig;
+import tv.memoryleakdeath.magentabreeze.conf.backend.StartDBAndRunMigrations;
 
 public class MagentaBreezeInit implements WebApplicationInitializer {
     public static final long MAX_UPLOAD_SIZE = 100L * 1024L * 1024L; // 100MB
@@ -25,14 +26,15 @@ public class MagentaBreezeInit implements WebApplicationInitializer {
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
-        rootContext.scan("tv.memoryleakdeath.magentabreeze.conf");
+        rootContext.scan("tv.memoryleakdeath.magentabreeze.conf.backend");
+        rootContext.setDisplayName("Root Context Magenta Breeze");
         servletContext.setSessionTrackingModes(Set.of(SessionTrackingMode.COOKIE));
 
         servletContext.setInitParameter("db.url", MagentaBreezeDBConfig.DB_URL);
         servletContext.setInitParameter("db.user", "mb");
         servletContext.setInitParameter("db.password", "");
         servletContext.setInitParameter("db.tcpServer", "-tcpAllowOthers -ifNotExists");
-        servletContext.addListener(new JakartaDbStarter());
+        servletContext.addListener(new StartDBAndRunMigrations());
 
         servletContext.addListener(new ContextLoaderListener(rootContext));
 
@@ -41,8 +43,12 @@ public class MagentaBreezeInit implements WebApplicationInitializer {
         characterEncodingFilter.setAsyncSupported(true);
         characterEncodingFilter.addMappingForUrlPatterns(null, true, "/*");
 
+        AnnotationConfigWebApplicationContext webContext = new AnnotationConfigWebApplicationContext();
+        webContext.scan("tv.memoryleakdeath.magentabreeze.conf.frontend");
+        webContext.setDisplayName("Web Context Magenta Breeze");
+        webContext.setParent(rootContext);
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher",
-                new DispatcherServlet(rootContext));
+                new DispatcherServlet(webContext));
         dispatcher.setAsyncSupported(true);
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/*");

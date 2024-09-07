@@ -1,4 +1,4 @@
-package tv.memoryleakdeath.magentabreeze.conf;
+package tv.memoryleakdeath.magentabreeze.conf.backend;
 
 import java.io.IOException;
 
