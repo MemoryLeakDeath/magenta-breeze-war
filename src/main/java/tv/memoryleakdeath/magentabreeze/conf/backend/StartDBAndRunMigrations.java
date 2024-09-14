@@ -14,7 +14,6 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class StartDBAndRunMigrations extends JakartaDbStarter {
     private static final Logger logger = LoggerFactory.getLogger(StartDBAndRunMigrations.class);
-
     private static boolean hasRun = false;
 
     @Override
@@ -24,11 +23,15 @@ public class StartDBAndRunMigrations extends JakartaDbStarter {
         runMigrations();
     }
 
+    private synchronized void setHasRun(boolean value) {
+        hasRun = value;
+    }
+
     private void runMigrations() {
         if (hasRun) {
             return;
         }
-        hasRun = true;
+        setHasRun(true);
         try {
             Database database = DatabaseFactory.getInstance()
                     .findCorrectDatabaseImplementation(new JdbcConnection(getConnection()));
