@@ -17,7 +17,7 @@
 		}
 	}
 </style>
-<div id="chatmessage-id" hx-get="[@spring.url "/chat/contents/${chatSettings.id}"][/@]" hx-trigger="sse:trigger-chat" class="">	
+<div id="chat-${chatSettings.id}" hx-trigger="sse:trigger-chat" class="">	
 </div>	
 <script type="text/javascript">
 	$('body').on('htmx:sseMessage', handleSSEEvent);
@@ -25,7 +25,8 @@
 	
 	function handleSSEEvent(event) {
         let data = JSON.parse(event.detail.data);
-		console.log('Event Payload ID: ' + data.eventId + ' Message: ' + data.chatMessage);
+		displayChatMessage(data.chatMessage);
+		doAnimation();
 	}
 	
 	function doAnimation() {
@@ -35,9 +36,14 @@
 	function displayChatMessage(message) {
 		let fontSize = "${chatSettings.settings.chatTextSize}";
 		let textColor = "${chatSettings.settings.chatTextColor}";
+		[#noparse]
 		let messageHtml = `<p class="d-flex justify-content-center" 
-			   style="font-size: ; font-weight: bold; color: ">
+			   style="font-size: ${fontSize}; font-weight: bold; color: ${textColor}">${message}
 			</p>`;
+		[/#noparse]
+		let chatHtml = $('#chat-${chatSettings.id}').html();
+		chatHtml += messageHtml;
+		$('#chat-${chatSettings.id}').html(chatHtml);
     }
 	
 	function stopAnimation() {
