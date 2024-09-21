@@ -10,7 +10,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> 
         <finalname>ROOT-${project.version}</finalname>       
-        <spring.framework.version>6.1.12</spring.framework.version>
+        <spring.framework.version>6.1.13</spring.framework.version>
 		<servlet.api.version>6.0.0</servlet.api.version>        
 		<slf4j.version>2.0.16</slf4j.version>
         <logback.version>1.5.8</logback.version>
