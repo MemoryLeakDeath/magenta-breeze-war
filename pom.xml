@@ -30,6 +30,8 @@
         <twitch4j.version>1.21.0</twitch4j.version>
         <httpclient.version>5.3.1</httpclient.version>
         <youtubeapi.version>v3-rev20240909-2.0.0</youtubeapi.version>
+        <htmlunit.version>4.4.0</htmlunit.version>
+        <flyingsaucer.version>9.9.4</flyingsaucer.version>
   </properties>
     <dependencyManagement>
         <dependencies>
@@ -150,6 +152,11 @@
 		    <groupId>com.google.apis</groupId>
 		    <artifactId>google-api-services-youtube</artifactId>
 		    <version>${youtubeapi.version}</version>
+		</dependency>
+		<dependency>
+		  <groupId>com.microsoft.playwright</groupId>
+		  <artifactId>playwright</artifactId>
+		  <version>1.41.0</version>
 		</dependency>
 				
 		<!-- TEST Dependencies -->
