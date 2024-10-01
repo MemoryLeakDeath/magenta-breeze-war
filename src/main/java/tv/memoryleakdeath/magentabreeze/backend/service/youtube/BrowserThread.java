@@ -1,11 +1,11 @@
 package tv.memoryleakdeath.magentabreeze.backend.service.youtube;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ResourceLoader;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.Browser.NewContextOptions;
@@ -15,20 +15,18 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.TimeoutError;
 
-import okio.Path;
-
 public class BrowserThread extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(BrowserThread.class);
     private static final String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36";
     private AtomicBoolean running = new AtomicBoolean(true);
     private String url;
     private String interceptUrl;
-    private ResourceLoader loader;
+    private ChatRouteInterceptor routeInterceptor;
 
-    public BrowserThread(String pageUrl, String interceptUrl, ResourceLoader loader) {
+    public BrowserThread(String pageUrl, String interceptUrl, ChatRouteInterceptor interceptor) {
         this.url = pageUrl;
         this.interceptUrl = interceptUrl;
-        this.loader = loader;
+        this.routeInterceptor = interceptor;
     }
 
     @Override
@@ -38,11 +36,11 @@ public class BrowserThread extends Thread {
             try (Browser chromeBrowser = playwright.chromium().launch()) {
                 BrowserContext context = chromeBrowser.newContext(new NewContextOptions().setUserAgent(USER_AGENT));
                 Page chatPage = context.newPage();
-                chatPage.route(interceptUrl, new ChatRouteInterceptor());
+                chatPage.route(interceptUrl, routeInterceptor);
                 chatPage.navigate(url);
                 chatPage.screenshot(
                         new Page.ScreenshotOptions().setPath(Paths.get(System.getProperty("java.io.tmpdir")
-                                + Path.DIRECTORY_SEPARATOR + "mb-chat-screenshot.png")));
+                                + File.separatorChar + "mb-chat-screenshot.png")));
                 WaitForConditionOptions waitOptions = new WaitForConditionOptions().setTimeout(20_000);
 
                 while (running.get()) {

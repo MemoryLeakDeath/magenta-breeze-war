@@ -5,7 +5,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,10 +15,10 @@ public class ChatBrowserService {
     private BrowserThread chatBrowserThread;
 
     @Autowired
-    private ResourceLoader loader;
+    private ChatRouteInterceptor routeInterceptor;
 
     public void launchChatBrowser() {
-        chatBrowserThread = new BrowserThread(CHAT_BASE_URL + "1ZsNB8cSbo0", CHAT_FETCH_URL, loader);
+        chatBrowserThread = new BrowserThread(CHAT_BASE_URL + "_XUYAyVLcOE", CHAT_FETCH_URL, routeInterceptor);
         chatBrowserThread.start();
     }
 
