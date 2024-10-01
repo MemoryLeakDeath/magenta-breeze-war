@@ -25,7 +25,7 @@
         <h2.version>2.3.232</h2.version>
         <freemarker.version>2.3.33</freemarker.version>
         <commonslang.version>3.17.0</commonslang.version>
-        <hikari.version>5.1.0</hikari.version>
+        <hikari.version>6.0.0</hikari.version>
         <velocity.version>2.4</velocity.version>
         <twitch4j.version>1.22.0</twitch4j.version>
         <httpclient.version>5.4</httpclient.version>
