@@ -25,7 +25,8 @@
 	
 	function handleSSEEvent(event) {
         let data = JSON.parse(event.detail.data);
-		displayChatMessage(data.chatMessage);
+        console.log(data);
+		displayChatMessage(data.authorName, data.chatMessage, data.authorThumbnail, data.timestamp);
 		doAnimation();
 	}
 	
@@ -33,12 +34,14 @@
 		$('#chat-${chatSettings.id}').addClass('animate-chat');
 	}
 	
-	function displayChatMessage(message) {
+	function displayChatMessage(authorName, message, thumbnail, timestamp) {
 		let fontSize = "${chatSettings.settings.chatTextSize}";
 		let textColor = "${chatSettings.settings.chatTextColor}";
 		[#noparse]
-		let messageHtml = `<p class="d-flex justify-content-center" 
-			   style="font-size: ${fontSize}; font-weight: bold; color: ${textColor}">${message}
+		let messageTime = new Date(timestamp / 1000).toString();
+		let messageHtml = `${messageTime}&nbsp;<p class="d-flex justify-content-center" 
+			   style="font-size: ${fontSize}; font-weight: bold; color: black">
+			     <img src="${thumbnail}" width="32" height="32">&nbsp;${authorName}: ${message}
 			</p>`;
 		[/#noparse]
 		let chatHtml = $('#chat-${chatSettings.id}').html();

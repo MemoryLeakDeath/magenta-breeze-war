@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import tv.memoryleakdeath.magentabreeze.common.pojo.ChatEventPayload;
+import tv.memoryleakdeath.magentabreeze.backend.integration.youtube.chat.YoutubeChatMessageEvent;
 
 /**
  * The ChatEventsService class is responsible for managing Server-Sent Events
@@ -52,15 +52,25 @@ public class ChatEventsService {
 
     @EventListener
     @Async
-    public void sendChatEvent(ChatEventPayload payload) {
+    public void sendYoutubeChatEvent(YoutubeChatMessageEvent event) {
+        ObjectMapper om = new ObjectMapper();
+        try {
+            String data = om.writeValueAsString(event);
+            sendChatEvent(data, event.getEventId());
+        } catch (JsonProcessingException e) {
+            logger.error("Unable to convert payload to json!", e);
+        }
+    }
+
+    private void sendChatEvent(String data, String eventId) {
         List<SseEmitter> failedEmitters = new ArrayList<>();
         listenerEventList.forEach(emitter -> {
-            logger.debug("Sending chat event to emitter for event id: {}", payload.getEventId());
-            SseEmitter.SseEventBuilder event = SseEmitter.event().name("trigger-chat").data(buildJsonPayload(payload));
+            logger.debug("Sending chat event to emitter for event id: {}", eventId);
+            SseEmitter.SseEventBuilder event = SseEmitter.event().name("trigger-chat").data(data);
             try {
                 emitter.send(event);
             } catch (IOException e) {
-                logger.error("Unable to send event id: %s to emitter!".formatted(payload.getEventId()), e);
+                logger.error("Unable to send event id: %s to emitter!".formatted(eventId), e);
                 emitter.completeWithError(e);
                 failedEmitters.add(emitter);
             }
@@ -68,13 +78,4 @@ public class ChatEventsService {
         listenerEventList.removeAll(failedEmitters);
     }
 
-    private String buildJsonPayload(ChatEventPayload payload) {
-        ObjectMapper om = new ObjectMapper();
-        try {
-            return om.writeValueAsString(payload);
-        } catch (JsonProcessingException e) {
-            logger.error("Unable to convert payload to json!", e);
-        }
-        return null;
-    }
 }

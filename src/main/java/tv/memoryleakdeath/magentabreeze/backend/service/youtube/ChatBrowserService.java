@@ -18,7 +18,7 @@ public class ChatBrowserService {
     private ChatRouteInterceptor routeInterceptor;
 
     public void launchChatBrowser() {
-        chatBrowserThread = new BrowserThread(CHAT_BASE_URL + "_XUYAyVLcOE", CHAT_FETCH_URL, routeInterceptor);
+        chatBrowserThread = new BrowserThread(CHAT_BASE_URL + "7ZnJcu7WeHY", CHAT_FETCH_URL, routeInterceptor);
         chatBrowserThread.start();
     }
 

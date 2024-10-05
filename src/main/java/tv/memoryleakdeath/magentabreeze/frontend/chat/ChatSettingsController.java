@@ -1,6 +1,8 @@
 package tv.memoryleakdeath.magentabreeze.frontend.chat;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletRequest;
 import tv.memoryleakdeath.magentabreeze.backend.dao.ChatSettingsDao;
-import tv.memoryleakdeath.magentabreeze.common.pojo.ChatEventPayload;
+import tv.memoryleakdeath.magentabreeze.backend.integration.youtube.chat.YoutubeChatMessageEvent;
 import tv.memoryleakdeath.magentabreeze.common.pojo.ChatSettings;
 import tv.memoryleakdeath.magentabreeze.common.pojo.ChatSettingsRow;
 import tv.memoryleakdeath.magentabreeze.frontend.BaseFrontendController;
@@ -195,9 +197,11 @@ public class ChatSettingsController extends BaseFrontendController {
 
     @GetMapping("/test/{id}")
     public String testChat(HttpServletRequest request, Model model, @PathVariable(name = "id") Long id) {
-        ChatEventPayload testPayload = new ChatEventPayload();
-        testPayload.setEventId(id);
-        testPayload.setChatMessage("This is a test chat message!");
+        YoutubeChatMessageEvent testPayload = new YoutubeChatMessageEvent();
+        testPayload.setEventId(UUID.randomUUID().toString());
+        testPayload.setChatMessage("This is a youtube test chat message!");
+        testPayload.setAuthorName("test user");
+        testPayload.setTimestamp(Instant.now().getEpochSecond());
         try {
             context.publishEvent(testPayload);
             addSuccessMessage(request, "text.chat.success.test");
