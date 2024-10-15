@@ -2,20 +2,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-	[#include "head.html"]
+	[#include "/layout/head.html"]
 </head>
 <body class="bg-body-color" data-bs-theme="dark">
 	<div class="row content-height">
-		[#include "navigation.html"]
+		[#include "/layout/navigation.html"]
 		<div class="col-9">
 			<!-- messages -->
-			[#include "messages.html"]
+			[#include "/layout/messages.html"]
 			<!-- Page Content -->
 			[#nested]
 		</div>		
 	</div>
 	<!-- footer content -->
-	[#include "footer.html"]
+	[#include "/layout/footer.html"]
 </body>
 </html>
+[/#macro]
+
+[#macro widget]
+	<!-- Widget Content -->
+	[#nested]
 [/#macro]

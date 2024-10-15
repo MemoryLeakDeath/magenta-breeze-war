@@ -1,7 +1,14 @@
 package tv.memoryleakdeath.magentabreeze.backend.integration.youtube.chat;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -19,6 +26,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class YoutubeChatEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(YoutubeChatEventHandler.class);
+    private static final String DATE_FORMAT_STRING = "MMM dd hh:mm:ss a";
+    private static SimpleDateFormat dateFormat = null;
 
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -26,6 +35,7 @@ public class YoutubeChatEventHandler {
     @EventListener
     @Async
     public void parseChatEvent(ParseYoutubeChatEvent event) {
+        initDateFormatter(event.getLocale());
         ObjectMapper mapper = new ObjectMapper();
         YoutubeChatMessageEvent messageEvent = new YoutubeChatMessageEvent();
         try {
@@ -40,6 +50,12 @@ public class YoutubeChatEventHandler {
         // send chat message event if any chat message was parsed
         if (messageEvent.getChatMessage() != null && messageEvent.getChatMessage().length() > 0) {
             sendChatEvent(messageEvent);
+        }
+    }
+
+    private void initDateFormatter(Locale locale) {
+        if (dateFormat == null) {
+            dateFormat = new SimpleDateFormat(DATE_FORMAT_STRING, locale);
         }
     }
 
@@ -97,11 +113,19 @@ public class YoutubeChatEventHandler {
     }
 
     private void processChatMessage(final JsonNode chatMessageNode, YoutubeChatMessageEvent messageEvent) {
-        List<JsonNode> messageNodes = chatMessageNode.findValues("text");
+        JsonNode messageArrayNode = chatMessageNode.findValue("runs");
         StringBuilder message = new StringBuilder("");
-        messageNodes.forEach(n -> {
-            message.append(n.textValue());
-        });
+        Iterator<JsonNode> elements = messageArrayNode.elements();
+        while (elements.hasNext()) {
+            JsonNode element = elements.next();
+            if (element.has("text")) {
+                message.append(element.get("text").textValue());
+            } else if (element.has("emoji")) {
+                processEmoji(element.get("emoji"), messageEvent, message);
+            } else {
+                logger.debug("Unknown chat message run token: {}", element.textValue());
+            }
+        }
         messageEvent.setChatMessage(message.toString());
     }
 
@@ -140,7 +164,9 @@ public class YoutubeChatEventHandler {
         String timestampString = timestampNode.textValue();
         if (timestampString.length() > 0) {
             try {
-                messageEvent.setTimestamp(Long.parseLong(timestampString));
+                Long timestamp = Long.parseLong(timestampString);
+                messageEvent.setTimestamp(timestamp);
+                messageEvent.setMessageDateTime(dateFormat.format(Date.from(Instant.ofEpochMilli(timestamp / 1000))));
             } catch (Exception e) {
                 logger.error("Unable to parse timestamp from youtube chat message", e);
             }
@@ -150,5 +176,22 @@ public class YoutubeChatEventHandler {
     private void sendChatEvent(YoutubeChatMessageEvent messageEvent) {
         messageEvent.setEventId(UUID.randomUUID().toString());
         publisher.publishEvent(messageEvent);
+    }
+
+    private void processEmoji(JsonNode entry, YoutubeChatMessageEvent messageEvent,
+            StringBuilder message) {
+        JsonNode emojiUrlNode = entry.findValue("url");
+        final String url = (emojiUrlNode != null ? emojiUrlNode.textValue() : "");
+        JsonNode shortcutsArrayNode = entry.findValue("shortcuts");
+        Map<String, String> shortcuts = new HashMap<>();
+        if (shortcutsArrayNode != null) {
+            shortcutsArrayNode.elements().forEachRemaining(n -> {
+                shortcuts.put(n.textValue(), url);
+            });
+        }
+        if (!shortcuts.isEmpty()) {
+            message.append(shortcuts.entrySet().stream().findFirst().get().getKey());
+        }
+        messageEvent.getEmojiMap().putAll(shortcuts);
     }
 }

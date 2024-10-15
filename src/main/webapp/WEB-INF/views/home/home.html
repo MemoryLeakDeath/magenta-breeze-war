@@ -4,5 +4,9 @@
 	
     <a href="[@spring.url '/startbrowser'][/@]" type="button" class="btn btn-primary">Start Chat Browser Test</a>	
     <a href="[@spring.url '/stopbrowser'][/@]" type="button" class="btn btn-primary">Stop Chat Browser Test</a>	
+    
+    <h3>Combined Chat</h3><br>    
+    <div id="chatdock" class="col-6" hx-get="[@spring.url '/dock/chat/'][/@]" hx-trigger="load">
+    </div>
 </div>
 [/@]

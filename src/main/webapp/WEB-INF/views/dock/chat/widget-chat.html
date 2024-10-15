@@ -1,0 +1,43 @@
+[@layout.widget]
+	<div hx-ext="sse" sse-connect="[@spring.url "/dock/chat/sse"][/@]">
+		<div id="chat" hx-trigger="sse:trigger-chat" class="">	
+		</div>	
+	</div>
+	<script type="text/javascript">
+		$('body').on('htmx:sseMessage', handleSSEEvent);
+		
+		function handleSSEEvent(event) {
+	        let data = JSON.parse(event.detail.data);
+	        console.log(data);
+			displayChatMessage(data.authorName, data.chatMessage, data.authorThumbnail, data.messageDateTime, data.emojiMap);
+		}
+		
+		function displayChatMessage(authorName, message, thumbnail, timestamp, emojiMap) {
+			let fontSize = "14";
+			let textColor = "#FFFFFF";
+			if(typeof emojiMap !== "undefined" && Object.keys(emojiMap).length > 0) {
+               message = replaceEmojis(message, emojiMap);
+            }
+			[#noparse]
+			let messageHtml = `<div class="d-flex justify-content-center" 
+				   style="font-size: ${fontSize}; font-weight: bold; color: ${textColor}">
+				   ${timestamp}&nbsp;<img src="${thumbnail}" width="32" height="32">&nbsp;${authorName}: ${message}
+				</div>`;
+			[/#noparse]
+			let chatHtml = $('#chat').html();
+			chatHtml += messageHtml;
+			$('#chat').html(chatHtml);
+	    }
+		
+		function replaceEmojis(message, emojiMap) {
+          let updatedMessage = message;
+          [#noparse]
+          Object.keys(emojiMap).forEach(k => {
+             let regex = new RegExp(k, "g");
+             updatedMessage = updatedMessage.replace(regex, `&nbsp;<img src="${emojiMap[k]}" width="24" height="24">&nbsp;`);
+          });
+          [/#noparse]
+          return updatedMessage;
+        }
+	</script>
+[/@]

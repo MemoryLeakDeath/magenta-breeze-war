@@ -1,7 +1,9 @@
 package tv.memoryleakdeath.magentabreeze.backend.integration.youtube.chat;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class YoutubeChatMessageEvent implements Serializable {
 
@@ -13,6 +15,8 @@ public class YoutubeChatMessageEvent implements Serializable {
     private String authorThumbnail;
     private String eventId;
     private Long timestamp;
+    private Map<String, String> emojiMap = new HashMap<>();
+    private String messageDateTime;
 
     public String getChatMessage() {
         return chatMessage;
@@ -66,6 +70,22 @@ public class YoutubeChatMessageEvent implements Serializable {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Map<String, String> getEmojiMap() {
+        return emojiMap;
+    }
+
+    public void setEmojiMap(Map<String, String> emojiMap) {
+        this.emojiMap = emojiMap;
+    }
+
+    public String getMessageDateTime() {
+        return messageDateTime;
+    }
+
+    public void setMessageDateTime(String messageDateTime) {
+        this.messageDateTime = messageDateTime;
     }
 
 }

@@ -1,5 +1,6 @@
 package tv.memoryleakdeath.magentabreeze.backend.service.youtube;
 
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -17,8 +18,9 @@ public class ChatBrowserService {
     @Autowired
     private ChatRouteInterceptor routeInterceptor;
 
-    public void launchChatBrowser() {
-        chatBrowserThread = new BrowserThread(CHAT_BASE_URL + "7ZnJcu7WeHY", CHAT_FETCH_URL, routeInterceptor);
+    public void launchChatBrowser(Locale locale) {
+        routeInterceptor.setLocale(locale);
+        chatBrowserThread = new BrowserThread(CHAT_BASE_URL + "dnyvvtAqdC4", CHAT_FETCH_URL, routeInterceptor);
         chatBrowserThread.start();
     }
 

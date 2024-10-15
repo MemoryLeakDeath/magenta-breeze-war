@@ -66,7 +66,7 @@ public class MagentaBreezeWebConfig implements WebMvcConfigurer {
     private Properties freemarkerSettings() {
         Properties props = new Properties();
         props.setProperty("autoImport",
-                "/spring.ftl as spring, macros/macros.html as mb, layout/layout.html as layout");
+                "/spring.ftl as spring, macros/macros.html as mb, macros/layout.html as layout");
         props.setProperty("apiBuiltinEnabled", "true");
         props.setProperty("defaultEncoding", "UTF-8");
         props.setProperty("lazyAutoImports", "true");

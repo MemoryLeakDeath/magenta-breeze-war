@@ -26,7 +26,7 @@ public class HomeController extends BaseFrontendController {
 
     @GetMapping("/startbrowser")
     public String startChatBrowser(HttpServletRequest request, Model model) {
-        chatBrowserService.launchChatBrowser();
+        chatBrowserService.launchChatBrowser(getLocale(request));
         addSuccessMessage(request, "text.success.browserlaunched");
         return "home/home";
     }
