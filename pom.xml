@@ -26,7 +26,7 @@
         <freemarker.version>2.3.33</freemarker.version>
         <commonslang.version>3.17.0</commonslang.version>
         <hikari.version>6.0.0</hikari.version>
-        <velocity.version>2.4</velocity.version>
+        <velocity.version>2.4.1</velocity.version>
         <twitch4j.version>1.21.0</twitch4j.version>
         <httpclient.version>5.4</httpclient.version>
         <youtubeapi.version>v3-rev20241010-2.0.0</youtubeapi.version>
