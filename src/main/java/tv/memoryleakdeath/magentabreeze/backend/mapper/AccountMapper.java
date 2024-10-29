@@ -19,6 +19,7 @@ public class AccountMapper implements RowMapper<Account> {
         account.setUpdated(rs.getDate("updated"));
         account.setDisplayName(rs.getString("displayname"));
         account.setProfileUrl(rs.getString("profileurl"));
+        account.setServiceUserId(rs.getString("serviceuserid"));
         return account;
     }
 

@@ -27,7 +27,7 @@
         <commonslang.version>3.17.0</commonslang.version>
         <hikari.version>6.0.0</hikari.version>
         <velocity.version>2.4</velocity.version>
-        <twitch4j.version>1.22.0</twitch4j.version>
+        <twitch4j.version>1.21.0</twitch4j.version>
         <httpclient.version>5.4</httpclient.version>
         <youtubeapi.version>v3-rev20241010-2.0.0</youtubeapi.version>
         <htmlunit.version>4.4.0</htmlunit.version>
@@ -138,10 +138,22 @@
 			<artifactId>spring-velocity-support</artifactId>
 			<version>${velocity.version}</version>
 		</dependency>
+		<!-- this is to override a bad transitive inclusion from okhttp -->
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib-common</artifactId>
+			<version>1.8.21</version>		
+		</dependency>		
 		<dependency>
 		    <groupId>com.github.twitch4j</groupId>
 		    <artifactId>twitch4j</artifactId>
 		    <version>${twitch4j.version}</version>
+		    <exclusions>
+		    	<exclusion>
+		    		<groupId>org.jetbrains.kotlin</groupId>
+		    		<artifactId>kotlin-stdlib-common</artifactId>
+		    	</exclusion>
+		    </exclusions>
 		</dependency>	
 		<dependency>
 		    <groupId>org.apache.httpcomponents.client5</groupId>

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpServletRequest;
+import tv.memoryleakdeath.magentabreeze.backend.service.twitch.TwitchChatService;
 import tv.memoryleakdeath.magentabreeze.backend.service.youtube.ChatBrowserService;
 
 @Controller
@@ -18,6 +19,9 @@ public class HomeController extends BaseFrontendController {
 
     @Autowired
     private ChatBrowserService chatBrowserService;
+
+    @Autowired
+    private TwitchChatService twitchChatService;
 
     @GetMapping("/")
     public String home(HttpServletRequest request, Model model) {
@@ -35,6 +39,13 @@ public class HomeController extends BaseFrontendController {
     public String stopChatBrowser(HttpServletRequest request, Model model) {
         chatBrowserService.stopChatBrowser();
         addSuccessMessage(request, "text.success.browserstopped");
+        return "home/home";
+    }
+
+    @GetMapping("/attachtwitch")
+    public String attachTwitchChat(HttpServletRequest request, Model model) {
+        twitchChatService.attachChat(getLocale(request));
+        addSuccessMessage(request, "text.success.twitchattached");
         return "home/home";
     }
 }

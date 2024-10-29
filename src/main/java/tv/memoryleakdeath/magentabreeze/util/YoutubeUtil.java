@@ -3,9 +3,12 @@ package tv.memoryleakdeath.magentabreeze.util;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Component;
 
 import com.google.api.client.auth.oauth2.BearerToken;
 import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
@@ -15,27 +18,35 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.youtube.YouTube;
 
+import jakarta.servlet.http.HttpServletRequest;
 import tv.memoryleakdeath.magentabreeze.frontend.oauth.YoutubeOAuthCallbackController;
 
-public final class YoutubeUtil {
+@Component
+public class YoutubeUtil {
     private static final Logger logger = LoggerFactory.getLogger(YoutubeUtil.class);
+    private static final String AUTH_URL_BASE = "https://accounts.google.com/o/oauth2/v2/auth";
+    private static final String OAUTH_RESPONSE_TYPE = "code";
+    private static final String[] OAUTH_SCOPES = { "https://www.googleapis.com/auth/youtube.readonly" };
+    private static final String REDIRECT_URI = "/oauth/yt_authenticate";
 
-    private YoutubeUtil() {
-    }
+    @Autowired
+    private ResourceLoader resourceLoader;
 
-    public static YouTube getService(Credential cred) {
-        try {
-            YouTube yt = new YouTube.Builder(GoogleNetHttpTransport.newTrustedTransport(),
-                    GsonFactory.getDefaultInstance(),
-                    cred).setApplicationName("Magenta Breeze").build();
-            return yt;
-        } catch (GeneralSecurityException | IOException e) {
-            logger.error("Unable to create a youtube api object!", e);
+    private YouTube yt;
+
+    public YouTube getService(Credential cred) {
+        if (yt == null) {
+            try {
+                yt = new YouTube.Builder(GoogleNetHttpTransport.newTrustedTransport(), GsonFactory.getDefaultInstance(),
+                        cred).setApplicationName("Magenta Breeze").build();
+            } catch (GeneralSecurityException | IOException e) {
+                logger.error("Unable to create a youtube api object!", e);
+            }
         }
-        return null;
+        return yt;
     }
 
-    public static Credential buildCredential(String accessToken, String refreshToken, Long expiresIn, ResourceLoader resourceLoader) {
+    public Credential buildCredential(String accessToken, String refreshToken, Long expiresIn) {
         Credential cred = null;
         String clientId = SecureStorageUtil.getValueKeyFromSecureStorage("youtubeclientid", resourceLoader);
         String clientSecret = SecureStorageUtil.getValueKeyFromSecureStorage("youtubeclientsecret", resourceLoader);
@@ -50,5 +61,14 @@ public final class YoutubeUtil {
             logger.error("Unable to build youtube credential for access!", e);
         }
         return cred;
+    }
+
+    public String buildYoutubeAuthUrl(HttpServletRequest request, String state) {
+        String redirectUrl = OAuthUtil.buildUrlPath(request, REDIRECT_URI);
+        String url = "%s?client_id=%s&redirect_uri=%s&response_type=%s&scope=%s&access_type=offline&prompt=select_account&state=%s"
+                .formatted(AUTH_URL_BASE,
+                        SecureStorageUtil.getValueKeyFromSecureStorage("youtubeclientid", resourceLoader), redirectUrl,
+                        OAUTH_RESPONSE_TYPE, StringUtils.join(OAUTH_SCOPES, ","), state);
+        return url;
     }
 }

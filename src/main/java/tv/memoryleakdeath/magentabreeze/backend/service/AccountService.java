@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import com.github.twitch4j.TwitchClient;
-import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.helix.domain.User;
-import com.github.twitch4j.helix.domain.UserList;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.Channel;
@@ -20,9 +17,11 @@ import com.google.api.services.youtube.model.ChannelListResponse;
 import com.google.api.services.youtube.model.ChannelSnippet;
 
 import tv.memoryleakdeath.magentabreeze.backend.dao.AccountsDao;
+import tv.memoryleakdeath.magentabreeze.common.OAuthTokenTypes;
 import tv.memoryleakdeath.magentabreeze.common.ServiceTypes;
 import tv.memoryleakdeath.magentabreeze.common.pojo.Account;
 import tv.memoryleakdeath.magentabreeze.util.SecureStorageUtil;
+import tv.memoryleakdeath.magentabreeze.util.TwitchUtil;
 import tv.memoryleakdeath.magentabreeze.util.YoutubeUtil;
 
 @Service
@@ -34,6 +33,12 @@ public class AccountService {
 
     @Autowired
     private ResourceLoader resourceLoader;
+
+    @Autowired
+    private TwitchUtil twitchUtil;
+
+    @Autowired
+    private YoutubeUtil youtubeUtil;
 
     public boolean createAccount(String accessToken, String refreshToken, String service, Long expiresIn) {
         boolean success = false;
@@ -51,28 +56,24 @@ public class AccountService {
         return createAccount(accessToken, null, service, null);
     }
 
-    private User getTwitchLoggedInUser(String accessToken) {
-        TwitchClient twitchClient = TwitchClientBuilder.builder().withEnableHelix(true).build();
-        UserList users = twitchClient.getHelix().getUsers(accessToken, null, null).execute();
-        return users.getUsers().stream().findFirst().orElse(null);
-    }
-
     private Account buildAccountObject(ServiceTypes service, User twitchUser) {
         Account account = new Account();
         account.setService(service.name());
         account.setDisplayName(twitchUser.getDisplayName());
         account.setProfileUrl(twitchUser.getProfileImageUrl());
+        account.setServiceUserId(twitchUser.getId());
         return account;
     }
 
     private boolean createTwitchLinkedAccount(String accessToken) {
         boolean success = false;
-        User twitchUser = getTwitchLoggedInUser(accessToken);
+        User twitchUser = twitchUtil.getTwitchLoggedInUser(accessToken);
         Account account = buildAccountObject(ServiceTypes.TWITCH, twitchUser);
         if (!accountsDao.createAccount(account)) {
             logger.error("Unable to create account for linkage!");
         } else {
-            SecureStorageUtil.saveOAuthTokenInSecureStorage(accessToken, "access_token", ServiceTypes.TWITCH,
+            SecureStorageUtil.saveOAuthTokenInSecureStorage(accessToken, OAuthTokenTypes.ACCESSTOKEN,
+                    ServiceTypes.TWITCH,
                     account.getId().intValue(), resourceLoader);
             success = true;
         }
@@ -81,15 +82,17 @@ public class AccountService {
 
     private boolean createYoutubeLinkedAccount(String accessToken, String refreshToken, Long expiresIn) {
         boolean success = false;
-        Credential cred = YoutubeUtil.buildCredential(accessToken, refreshToken, expiresIn, resourceLoader);
+        Credential cred = youtubeUtil.buildCredential(accessToken, refreshToken, expiresIn);
         ChannelSnippet youtubeUser = getYoutubeLoggedInUser(cred);
         Account account = buildAccountObject(ServiceTypes.YOUTUBE, youtubeUser);
         if (!accountsDao.createAccount(account)) {
             logger.error("Unable to create account for linkage!");
         } else {
-            SecureStorageUtil.saveOAuthTokenInSecureStorage(accessToken, "access_token", ServiceTypes.YOUTUBE,
+            SecureStorageUtil.saveOAuthTokenInSecureStorage(accessToken, OAuthTokenTypes.ACCESSTOKEN,
+                    ServiceTypes.YOUTUBE,
                     account.getId().intValue(), resourceLoader);
-            SecureStorageUtil.saveOAuthTokenInSecureStorage(refreshToken, "refresh_token", ServiceTypes.YOUTUBE,
+            SecureStorageUtil.saveOAuthTokenInSecureStorage(refreshToken, OAuthTokenTypes.REFRESHTOKEN,
+                    ServiceTypes.YOUTUBE,
                     account.getId().intValue(), resourceLoader);
             success = true;
         }
@@ -97,7 +100,7 @@ public class AccountService {
     }
 
     private ChannelSnippet getYoutubeLoggedInUser(Credential cred) {
-        YouTube yt = YoutubeUtil.getService(cred);
+        YouTube yt = youtubeUtil.getService(cred);
         try {
             YouTube.Channels.List request = yt.channels().list(List.of("snippet"));
             ChannelListResponse response = request.setMine(true).execute();
@@ -120,5 +123,14 @@ public class AccountService {
         account.setDisplayName(youtubeUser.getTitle());
         account.setProfileUrl(youtubeUser.getThumbnails().getMedium().getUrl());
         return account;
+    }
+
+    public Integer getTwitchChatAccountId() {
+        return accountsDao.getTwitchChatAccount();
+    }
+
+    public Account getTwitchChatAccount() {
+        Integer accountId = accountsDao.getTwitchChatAccount();
+        return accountsDao.getAccountById(accountId);
     }
 }

@@ -2,6 +2,8 @@ package tv.memoryleakdeath.magentabreeze.conf.backend;
 
 import java.io.IOException;
 
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.VelocityException;
 import org.apache.velocity.spring.VelocityEngineFactoryBean;
@@ -13,7 +15,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
 @Configuration
-@ComponentScan("tv.memoryleakdeath.magentabreeze.backend")
+@ComponentScan({ "tv.memoryleakdeath.magentabreeze.backend", "tv.memoryleakdeath.magentabreeze.util" })
 @PropertySource("classpath:version.properties")
 public class MagentaBreezeApplicationConfig {
 
@@ -34,5 +36,10 @@ public class MagentaBreezeApplicationConfig {
     @Bean(name = "installBaseDir")
     public String installBaseDir() {
         return "/home/mem/magentabreeze"; // TODO: read from command line args
+    }
+
+    @Bean
+    public CloseableHttpClient httpClient() {
+        return HttpClients.createDefault();
     }
 }

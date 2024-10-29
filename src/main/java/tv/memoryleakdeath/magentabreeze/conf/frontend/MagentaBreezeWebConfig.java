@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -124,10 +122,4 @@ public class MagentaBreezeWebConfig implements WebMvcConfigurer {
     public MultipartResolver multipartResolver() {
         return new StandardServletMultipartResolver();
     }
-
-    @Bean
-    public CloseableHttpClient httpClient() {
-        return HttpClients.createDefault();
-    }
-
 }

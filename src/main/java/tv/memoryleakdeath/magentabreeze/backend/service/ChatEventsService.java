@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import tv.memoryleakdeath.magentabreeze.backend.integration.youtube.chat.TwitchChatMessageEvent;
 import tv.memoryleakdeath.magentabreeze.backend.integration.youtube.chat.YoutubeChatMessageEvent;
 
 /**
@@ -53,13 +54,23 @@ public class ChatEventsService {
     @EventListener
     @Async
     public void sendYoutubeChatEvent(YoutubeChatMessageEvent event) {
+        sendChatEvent(getJsonString(event), event.getEventId());
+    }
+
+    @EventListener
+    @Async
+    public void sendTwitchChatEvent(TwitchChatMessageEvent event) {
+        sendChatEvent(getJsonString(event), event.getEventId());
+    }
+
+    private <T> String getJsonString(T event) {
         ObjectMapper om = new ObjectMapper();
         try {
-            String data = om.writeValueAsString(event);
-            sendChatEvent(data, event.getEventId());
+            return om.writeValueAsString(event);
         } catch (JsonProcessingException e) {
             logger.error("Unable to convert payload to json!", e);
         }
+        return null;
     }
 
     private void sendChatEvent(String data, String eventId) {

@@ -13,6 +13,7 @@ public class Account implements Serializable {
     private Date updated;
     private String displayName;
     private String profileUrl;
+    private String serviceUserId;
 
     public Long getId() {
         return id;
@@ -68,5 +69,13 @@ public class Account implements Serializable {
 
     public void setProfileUrl(String profileUrl) {
         this.profileUrl = profileUrl;
+    }
+
+    public String getServiceUserId() {
+        return serviceUserId;
+    }
+
+    public void setServiceUserId(String serviceUserId) {
+        this.serviceUserId = serviceUserId;
     }
 }
