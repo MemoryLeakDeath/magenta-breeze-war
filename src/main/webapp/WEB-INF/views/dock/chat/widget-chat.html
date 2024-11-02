@@ -9,7 +9,7 @@
 		function handleSSEEvent(event) {
 	        let data = JSON.parse(event.detail.data);
 	        console.log(data);
-			displayChatMessage(data.authorName, data.chatMessage, data.authorThumbnail, data.messageDateTime, data.emojiMap);
+			displayChatMessage(data.authorName, data.chatMessage, data.authorThumbnail, data.messageDateTime, data.emoteMap);
 		}
 		
 		function displayChatMessage(authorName, message, thumbnail, timestamp, emojiMap) {
@@ -30,13 +30,19 @@
 	    }
 		
 		function replaceEmojis(message, emojiMap) {
-          let updatedMessage = message;
+          let updatedMessage = "" + message;
+          console.log('replaceEmojis updatedMessage start: ' + updatedMessage);
           [#noparse]
           Object.keys(emojiMap).forEach(k => {
-             let regex = new RegExp(k, "g");
-             updatedMessage = updatedMessage.replace(regex, `&nbsp;<img src="${emojiMap[k]}" width="24" height="24">&nbsp;`);
+             let regex = new RegExp(escapeRegExp(k), "g");
+             if(regex.test(message)) {
+                 console.log('emoji found!: ' + k);
+                 updatedMessage = updatedMessage.replace(regex, `&nbsp;<img src="${emojiMap[k]}" width="24" height="24">&nbsp;`);
+                 console.log('emoji updated message: ' + updatedMessage);
+             }
           });
           [/#noparse]
+          console.log('final updated message: ' + updatedMessage);
           return updatedMessage;
         }
 	</script>

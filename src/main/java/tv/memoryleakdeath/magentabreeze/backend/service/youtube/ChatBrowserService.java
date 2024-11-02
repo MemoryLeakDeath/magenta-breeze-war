@@ -20,7 +20,7 @@ public class ChatBrowserService {
 
     public void launchChatBrowser(Locale locale) {
         routeInterceptor.setLocale(locale);
-        chatBrowserThread = new BrowserThread(CHAT_BASE_URL + "dnyvvtAqdC4", CHAT_FETCH_URL, routeInterceptor);
+        chatBrowserThread = new BrowserThread(CHAT_BASE_URL + "LxE7AztM_no", CHAT_FETCH_URL, routeInterceptor);
         chatBrowserThread.start();
     }
 

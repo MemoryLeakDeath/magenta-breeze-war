@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -42,9 +43,12 @@ public class TwitchUtil {
     private static final String AUTH_URL_BASE = "https://id.twitch.tv/oauth2/authorize";
     private static final String REDIRECT_URI = "/oauth/authenticate";
     private static final String OAUTH_RESPONSE_TYPE = "token";
-    private static final String[] OAUTH_SCOPES = { "user:read:broadcast", "chat:read", "chat:edit", "user:bot" };
+    private static final String[] OAUTH_SCOPES = { "user:read:broadcast", "chat:read", "chat:edit", "user:read:chat",
+            "user:write:chat", "user:bot" };
     private static final String CLIENT_FLOW_APP_TOKEN_URL = "https://id.twitch.tv/oauth2/token";
     private static final String CLIENT_FLOW_GRANT_TYPE = "client_credentials";
+    private static final String VALIDATE_TOKEN_URL = "https://id.twitch.tv/oauth2/validate";
+    private static final String TWITCH_APP_AUTH_KEY = "twitchappkey";
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -63,12 +67,11 @@ public class TwitchUtil {
     }
 
     private void initConduit() {
-        TwitchOAuthAppTokenResponse appToken = getNewAppToken();
-        Assert.notNull(appToken, "Unable to retrieve new app token from Twitch!");
-        Assert.notNull(appToken.getAccessToken(), "Unable to retreive new app access token from Twitch!");
+        String accessToken = getAccessToken();
+        Assert.notNull(accessToken, "Unable to retreive new app access token from Twitch!");
         try {
             conduit = TwitchConduitSocketPool.create(spec -> {
-                spec.appAccessToken(new OAuth2Credential("twitch", appToken.getAccessToken()));
+                spec.appAccessToken(new OAuth2Credential("twitch", accessToken));
                 spec.poolShards(4);
             });
         } catch (Exception e) {
@@ -111,7 +114,62 @@ public class TwitchUtil {
         return null;
     }
 
-    public TwitchOAuthAppTokenResponse getNewAppToken() {
+    public String getAccessToken() {
+        TwitchOAuthAppTokenResponse response = getValidToken();
+        if (response != null && response.getAccessToken() != null) {
+            return response.getAccessToken();
+        }
+        return null;
+    }
+
+    private TwitchOAuthAppTokenResponse getValidToken() {
+        TwitchOAuthAppTokenResponse tokenResponse = null;
+        // step 1 - check storage
+        String token = SecureStorageUtil.getValueKeyFromSecureStorage(TWITCH_APP_AUTH_KEY, resourceLoader);
+        if (token == null) {
+            logger.debug("No twitch app token found in storage, retrieving new one!");
+            tokenResponse = getAndStoreNewAppToken();
+        } else {
+            // step 2 - check validity
+            if (isTokenValid(token)) {
+                tokenResponse = new TwitchOAuthAppTokenResponse();
+                tokenResponse.setAccessToken(token);
+                logger.debug("Twitch app token found and valid, returning...");
+            } else {
+                logger.debug("Twitch app token not valid, retrieving new one!");
+                tokenResponse = getAndStoreNewAppToken();
+            }
+        }
+        return tokenResponse;
+    }
+
+    private boolean isTokenValid(String token) {
+        HttpGet get = new HttpGet(VALIDATE_TOKEN_URL);
+        get.addHeader("Authorization", "Bearer " + token);
+        try {
+            boolean valid = httpClient.execute(get, new HttpClientResponseHandler<Boolean>() {
+                @Override
+                public Boolean handleResponse(ClassicHttpResponse response) throws HttpException, IOException {
+                    return (response.getCode() == 200);
+                }
+            });
+            return valid;
+        } catch (Exception e) {
+            logger.error("Unable to validate twitch bearer token!", e);
+        }
+        return false;
+    }
+
+    private TwitchOAuthAppTokenResponse getAndStoreNewAppToken() {
+        TwitchOAuthAppTokenResponse tokenResponse = getNewAppToken();
+        Assert.notNull(tokenResponse, "App Token response was null from Twitch!");
+        Assert.notNull(tokenResponse.getAccessToken(), "App access token was not received from Twitch!");
+        SecureStorageUtil.saveValueKeyInSecureStorage(TWITCH_APP_AUTH_KEY, tokenResponse.getAccessToken(),
+                resourceLoader);
+        return tokenResponse;
+    }
+
+    private TwitchOAuthAppTokenResponse getNewAppToken() {
         HttpPost post = new HttpPost(CLIENT_FLOW_APP_TOKEN_URL);
         List<NameValuePair> values = new ArrayList<>();
         values.add(new BasicNameValuePair("client_id",
@@ -129,7 +187,7 @@ public class TwitchUtil {
                 }
             });
             return parseAppTokenResponse(result);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("Unable to contact youtube to exchange initial auth token!", e);
         }
         return null;

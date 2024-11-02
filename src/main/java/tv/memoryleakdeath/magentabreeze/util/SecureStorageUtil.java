@@ -166,6 +166,20 @@ public final class SecureStorageUtil {
         return getValueFromSecureStorage(KEYS_TOKEN_MAP_NAME, key, loader);
     }
 
+    public static boolean saveValueKeyInSecureStorage(String key, String value, ResourceLoader loader) {
+        boolean success = false;
+        try (MVStore store = getMVStore(getResourceFilePath(loader), getCurrentKey(loader))) {
+            MVMap<String, String> storedTokens = store.openMap(KEYS_TOKEN_MAP_NAME);
+            storedTokens.put(key, value);
+            logger.debug("Storing new value key for key: {}", key);
+            store.commit();
+            success = true;
+        } catch (Exception e) {
+            logger.error("Failed to open secure storage to save new value!", e);
+        }
+        return success;
+    }
+
     public static boolean saveOAuthTokenInSecureStorage(String token, OAuthTokenTypes tokenType, ServiceTypes service,
             int accountId,
             ResourceLoader loader) {

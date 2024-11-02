@@ -13,9 +13,6 @@ import tv.memoryleakdeath.magentabreeze.backend.service.youtube.ChatBrowserServi
 @Controller
 @RequestMapping("/")
 public class HomeController extends BaseFrontendController {
-    private static final String YT_TOKEN_URL = "https://oauth2.googleapis.com/token";
-    private static final String YT_CERT_URL = "https://www.googleapis.com/oauth2/v1/certs";
-    private static final String YT_AUTH_URL = "https://accounts.google.com/o/oauth2/auth";
 
     @Autowired
     private ChatBrowserService chatBrowserService;
