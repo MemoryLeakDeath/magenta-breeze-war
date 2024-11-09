@@ -131,7 +131,14 @@ public class AccountsDao {
     public boolean updateAccount(Account account) {
         String sql = "update accounts set service = ?, chatonly = ?, updated = CURRENT_TIMESTAMP(), displayname = ?, profileurl = ?, serviceuserid = ? where id = ?";
         int rowsAffected = jdbcTemplate.update(sql, account.getService(), account.isChatOnly(),
-                account.getDisplayName(), account.getProfileUrl(), account.getId(), account.getServiceUserId());
+                account.getDisplayName(), account.getProfileUrl(), account.getServiceUserId(), account.getId());
+        return (rowsAffected > 0);
+    }
+
+    @Transactional
+    public boolean updateChatOnlyFlag(long id, boolean flag) {
+        String sql = "update accounts set chatonly = ?, updated = CURRENT_TIMESTAMP() where id = ?";
+        int rowsAffected = jdbcTemplate.update(sql, flag, id);
         return (rowsAffected > 0);
     }
 

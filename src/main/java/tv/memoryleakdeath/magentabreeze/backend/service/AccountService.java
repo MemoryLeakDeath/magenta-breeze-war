@@ -56,6 +56,24 @@ public class AccountService {
         return createAccount(accessToken, null, service, null);
     }
 
+    public boolean updateAccount(String accessToken, String refreshToken, String service, Long expiresIn,
+            Integer accountId) {
+        boolean success = false;
+        Account account = accountsDao.getAccountById(accountId);
+        if (ServiceTypes.TWITCH.name().equals(service)) {
+            logger.debug("Starting update process for linked twitch user...");
+            success = updateTwitchLinkedAccount(account, accessToken);
+        } else if (ServiceTypes.YOUTUBE.name().equals(service)) {
+            logger.debug("Starting update process for linked youtube user...");
+            success = updateYoutubeLinkedAccount(account, accessToken, refreshToken, expiresIn);
+        }
+        return success;
+    }
+
+    public boolean updateAccount(String accessToken, String service, Integer accountId) {
+        return updateAccount(accessToken, null, service, null, accountId);
+    }
+
     private Account buildAccountObject(ServiceTypes service, User twitchUser) {
         Account account = new Account();
         account.setService(service.name());
@@ -80,6 +98,22 @@ public class AccountService {
         return success;
     }
 
+    private boolean updateTwitchLinkedAccount(Account account, String accessToken) {
+        boolean success = false;
+        User twitchUser = twitchUtil.getTwitchLoggedInUser(accessToken);
+        account.setDisplayName(twitchUser.getDisplayName());
+        account.setProfileUrl(twitchUser.getProfileImageUrl());
+        account.setServiceUserId(twitchUser.getId());
+        if (!accountsDao.updateAccount(account)) {
+            logger.error("Unable to update account linkage!");
+        } else {
+            SecureStorageUtil.saveOAuthTokenInSecureStorage(accessToken, OAuthTokenTypes.ACCESSTOKEN,
+                    ServiceTypes.TWITCH, account.getId().intValue(), resourceLoader);
+            success = true;
+        }
+        return success;
+    }
+
     private boolean createYoutubeLinkedAccount(String accessToken, String refreshToken, Long expiresIn) {
         boolean success = false;
         Credential cred = youtubeUtil.buildCredential(accessToken, refreshToken, expiresIn);
@@ -94,6 +128,25 @@ public class AccountService {
             SecureStorageUtil.saveOAuthTokenInSecureStorage(refreshToken, OAuthTokenTypes.REFRESHTOKEN,
                     ServiceTypes.YOUTUBE,
                     account.getId().intValue(), resourceLoader);
+            success = true;
+        }
+        return success;
+    }
+
+    private boolean updateYoutubeLinkedAccount(Account account, String accessToken, String refreshToken,
+            Long expiresIn) {
+        boolean success = false;
+        Credential cred = youtubeUtil.buildCredential(accessToken, refreshToken, expiresIn);
+        ChannelSnippet youtubeUser = getYoutubeLoggedInUser(cred);
+        account.setDisplayName(youtubeUser.getTitle());
+        account.setProfileUrl(youtubeUser.getThumbnails().getDefault().getUrl());
+        if (!accountsDao.updateAccount(account)) {
+            logger.error("Unable to update account linkage!");
+        } else {
+            SecureStorageUtil.saveOAuthTokenInSecureStorage(accessToken, OAuthTokenTypes.ACCESSTOKEN,
+                    ServiceTypes.YOUTUBE, account.getId().intValue(), resourceLoader);
+            SecureStorageUtil.saveOAuthTokenInSecureStorage(refreshToken, OAuthTokenTypes.REFRESHTOKEN,
+                    ServiceTypes.YOUTUBE, account.getId().intValue(), resourceLoader);
             success = true;
         }
         return success;
@@ -121,7 +174,7 @@ public class AccountService {
         Account account = new Account();
         account.setService(service.name());
         account.setDisplayName(youtubeUser.getTitle());
-        account.setProfileUrl(youtubeUser.getThumbnails().getMedium().getUrl());
+        account.setProfileUrl(youtubeUser.getThumbnails().getDefault().getUrl());
         return account;
     }
 
@@ -132,5 +185,21 @@ public class AccountService {
     public Account getTwitchChatAccount() {
         Integer accountId = accountsDao.getTwitchChatAccount();
         return accountsDao.getAccountById(accountId);
+    }
+
+    public List<Account> getAllAccounts() {
+        return accountsDao.getAllAccounts();
+    }
+
+    public boolean updateAccount(Account account) {
+        return accountsDao.updateAccount(account);
+    }
+
+    public boolean deleteAccount(long accountId) {
+        return accountsDao.deleteAccount(accountId);
+    }
+
+    public boolean updateChatOnlyFlag(long accountId, boolean flag) {
+        return accountsDao.updateChatOnlyFlag(accountId, flag);
     }
 }

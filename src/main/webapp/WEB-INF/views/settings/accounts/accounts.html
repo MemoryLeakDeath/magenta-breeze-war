@@ -15,7 +15,7 @@
 	<table class="table table-hover">
 		<thead>
 			<tr>
-				<td>&nbsp;</td>
+				<td>[@spring.message "label.chatonly"][/@]</td>
 				<td>&nbsp;</td>
 				<td>[@spring.message "label.service"][/@]</td>
 				<td>[@spring.message "label.updated"][/@]</td>
@@ -27,12 +27,12 @@
 			<tr class="">
 				<td style="width: 100px;">[@mb.switchNoLabel name="chatOnly" labelLookupOn="label.active" labelLookupOff="label.inactive" value=account.chatOnly?c extra='data-id="'?no_esc + account.id?no_esc + '"'?no_esc][/@]</td>
 				<td style="width: 200px;">
-					[@mb.buttonIcon "editButton-${account.id}" "fa-pencil" "fas" "button.edit" "btn-sm" 'data-id="'?no_esc + account.id?no_esc + '"'?no_esc][/@]
+					[@mb.buttonIcon "relinkButton-${account.id}" "fa-repeat" "fas" "button.relink" "btn-sm" 'data-id="'?no_esc + account.id?no_esc + '"'?no_esc][/@]
 					[@mb.buttonIcon "deleteButton-${account.id}" "fa-trash" "fas" "button.delete" "btn-sm" 'data-id="'?no_esc + account.id?no_esc + '"'?no_esc][/@]
 			    </td>
 				<td style="width: 300px;">
 					<span>
-						<img src="${account.profileUrl}" width="25" height="25">&nbsp;${account.displayName}
+						<img src="${account.profileUrl?no_esc}" width="25" height="25">&nbsp;${account.displayName}
 					</span>
 				</td>
 				<td>${account.updated}</td>
@@ -42,4 +42,42 @@
 		</tbody>
 	</table>
 </div>
+<form id="delete-form" method="POST" action="[@spring.url '/settings/accounts/delete'][/@]" accept-charset="UTF-8">
+	<input type="hidden" name="id" value="">
+</form>
+<form id="relink-form" method="POST" action="[@spring.url '/settings/accounts/relinktwitch'][/@]" accept-charset="UTF-8">
+	<input type="hidden" name="id" value="">
+</form>
+
+<script type="text/javascript">
+$('[id *= "deleteButton-"]').on("click", doDelete);
+$('[id *= "relinkButton-"]').on("click", doRelink);
+$('body').on('change', 'input[name="chatOnly"]', toggleActive);
+
+function toggleActive() {
+	var id = $(this).data('id');
+	var errorMsg = "[@spring.message 'text.error.systemerror'][/@]";
+	var url = "[@spring.url '/settings/accounts/togglechatonly'][/@]";
+	var activeFlag = $(this).prop('checked');
+	var that = $(this);
+	$.post(url, {"id": id, "active": activeFlag}).fail(function() {
+		$(that).prop('checked', !activeFlag);
+		showErrorMessage(errorMsg, closeMsg);			
+	});
+}
+
+function doDelete() {
+    if(confirm('[@spring.message "text.accounts.confirm.delete"][/@]')) {
+    	$('#delete-form input[name="id"]').val($(this).data('id'));
+    	$('#delete-form').submit();
+	}
+}
+
+function doRelink() {
+    if(confirm('[@spring.message "text.accounts.confirm.relink"][/@]')) {
+    	$('#relink-form input[name="id"]').val($(this).data('id'));
+    	$('#relink-form').submit();
+	}
+}
+</script>
 [/@]

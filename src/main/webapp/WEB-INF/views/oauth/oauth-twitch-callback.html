@@ -14,7 +14,7 @@
 	    </script>	    
 	</head>	
 	<body>
-		<form id="oauth-submit" action="[@spring.url "/settings/accounts/create"][/@]" method="POST" accept-charset="UTF-8">
+		<form id="oauth-submit" action="[@spring.url createUrl][/@]" method="POST" accept-charset="UTF-8">
 			<input type="hidden" id="access_token" name="access_token" value="">
 			<input type="hidden" id="scope" name="scope" value="">
 			<input type="hidden" id="state" name="state" value="">

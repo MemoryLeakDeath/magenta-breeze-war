@@ -21,8 +21,23 @@ public class TwitchOAuthCallbackController extends BaseFrontendController {
             @RequestParam(name = "error", required = false) String error,
             @RequestParam(name = "error_description", required = false) String errorDescription,
             @RequestParam(name = "state", required = false) String state) {
+        model.addAttribute("createUrl", "/settings/accounts/create");
         if (error != null) {
             logger.error("Error during OAuth authorization: {} - {} - {}", error, errorDescription, state);
+            addErrorMessage(request, "text.error.systemerror");
+            return "redirect:/";
+        }
+        return "oauth/oauth-twitch-callback";
+    }
+
+    @GetMapping("/reauthenticate")
+    public String reauthenticate(HttpServletRequest request, Model model,
+            @RequestParam(name = "error", required = false) String error,
+            @RequestParam(name = "error_description", required = false) String errorDescription,
+            @RequestParam(name = "state", required = false) String state) {
+        model.addAttribute("createUrl", "/settings/accounts/update");
+        if (error != null) {
+            logger.error("Error during OAuth reauthorization: {} - {} - {}", error, errorDescription, state);
             addErrorMessage(request, "text.error.systemerror");
             return "redirect:/";
         }

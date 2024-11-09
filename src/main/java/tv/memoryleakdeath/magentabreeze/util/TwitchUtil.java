@@ -42,6 +42,7 @@ public class TwitchUtil {
     private static final Logger logger = LoggerFactory.getLogger(TwitchUtil.class);
     private static final String AUTH_URL_BASE = "https://id.twitch.tv/oauth2/authorize";
     private static final String REDIRECT_URI = "/oauth/authenticate";
+    private static final String REAUTH_REDIRECT_URI = "/oauth/reauthenticate";
     private static final String OAUTH_RESPONSE_TYPE = "token";
     private static final String[] OAUTH_SCOPES = { "user:read:broadcast", "chat:read", "chat:edit", "user:read:chat",
             "user:write:chat", "user:bot" };
@@ -91,6 +92,13 @@ public class TwitchUtil {
         return "%s?client_id=%s&redirect_uri=%s&response_type=%s&scope=%s&state=%s".formatted(AUTH_URL_BASE,
                 SecureStorageUtil.getValueKeyFromSecureStorage("twitchapikey", resourceLoader), redirectUrl,
                 OAUTH_RESPONSE_TYPE, StringUtils.join(OAUTH_SCOPES, " "), state);
+    }
+
+    public String buildTwitchReAuthUrl(HttpServletRequest request, String state, Long accountId) {
+        String redirectUrl = OAuthUtil.buildUrlPath(request, REAUTH_REDIRECT_URI);
+        return "%s?client_id=%s&redirect_uri=%s&response_type=%s&scope=%s&state=%s_%d&force_verify=true".formatted(
+                AUTH_URL_BASE, SecureStorageUtil.getValueKeyFromSecureStorage("twitchapikey", resourceLoader),
+                redirectUrl, OAUTH_RESPONSE_TYPE, StringUtils.join(OAUTH_SCOPES, " "), state, accountId);
     }
 
     public User getTwitchLoggedInUser(String accessToken) {
