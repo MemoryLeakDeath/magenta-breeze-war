@@ -28,6 +28,7 @@ public class YoutubeUtil {
     private static final String OAUTH_RESPONSE_TYPE = "code";
     private static final String[] OAUTH_SCOPES = { "https://www.googleapis.com/auth/youtube.readonly" };
     private static final String REDIRECT_URI = "/oauth/yt_authenticate";
+    private static final String REAUTH_REDIRECT_URI = "/oauth/yt_reauthenticate";
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -65,10 +66,20 @@ public class YoutubeUtil {
 
     public String buildYoutubeAuthUrl(HttpServletRequest request, String state) {
         String redirectUrl = OAuthUtil.buildUrlPath(request, REDIRECT_URI);
-        String url = "%s?client_id=%s&redirect_uri=%s&response_type=%s&scope=%s&access_type=offline&prompt=select_account&state=%s"
+        return buildAuthUrl(redirectUrl, state, "offline", "select_account");
+    }
+
+    public String buildYoutubeReauthUrl(HttpServletRequest request, String state, Long accountId) {
+        String redirectUrl = OAuthUtil.buildUrlPath(request, REAUTH_REDIRECT_URI);
+        String reauth_state = "%s_%d".formatted(state, accountId);
+        return buildAuthUrl(redirectUrl, reauth_state, "offline", "consent");
+    }
+
+    private String buildAuthUrl(String redirectUrl, String state, String accessType, String prompt) {
+        String url = "%s?client_id=%s&redirect_uri=%s&response_type=%s&scope=%s&access_type=%s&prompt=%s&state=%s"
                 .formatted(AUTH_URL_BASE,
                         SecureStorageUtil.getValueKeyFromSecureStorage("youtubeclientid", resourceLoader), redirectUrl,
-                        OAUTH_RESPONSE_TYPE, StringUtils.join(OAUTH_SCOPES, ","), state);
+                        OAUTH_RESPONSE_TYPE, StringUtils.join(OAUTH_SCOPES, ","), accessType, prompt, state);
         return url;
     }
 }

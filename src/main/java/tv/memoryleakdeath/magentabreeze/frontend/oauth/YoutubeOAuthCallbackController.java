@@ -43,6 +43,7 @@ public class YoutubeOAuthCallbackController extends BaseFrontendController {
     private static final Logger logger = LoggerFactory.getLogger(YoutubeOAuthCallbackController.class);
     public static final String TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
     private static final String YT_REDIRECT_URI = "/oauth/yt_authenticate";
+    private static final String YT_REAUTH_REDIRECT_URI = "/oauth/yt_reauthenticate";
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -64,7 +65,7 @@ public class YoutubeOAuthCallbackController extends BaseFrontendController {
             return "redirect:/";
         }
         try {
-            YoutubeOAuthResponse auth = exchangeToken(request, initialAuthCode);
+            YoutubeOAuthResponse auth = exchangeToken(request, initialAuthCode, YT_REDIRECT_URI);
             if (auth == null) {
                 logger.error("No auth object was created!");
                 addErrorMessage(request, "text.error.systemerror");
@@ -85,14 +86,58 @@ public class YoutubeOAuthCallbackController extends BaseFrontendController {
         return "redirect:/settings/accounts/";
     }
 
-    private YoutubeOAuthResponse exchangeToken(HttpServletRequest request, String initialAuthCode) {
+    @GetMapping("/yt_reauthenticate")
+    public String reauthenticate(HttpServletRequest request, Model model,
+            @RequestParam(name = "error", required = false) String error,
+            @RequestParam(name = "code", required = false) String initialAuthCode,
+            @RequestParam(name = "state", required = false) String state) {
+        if (error != null) {
+            logger.error("Error during OAuth authorization: {}", error);
+            addErrorMessage(request, "text.error.systemerror");
+            return "redirect:/";
+        }
+        try {
+            YoutubeOAuthResponse auth = exchangeToken(request, initialAuthCode, YT_REAUTH_REDIRECT_URI);
+            if (auth == null) {
+                logger.error("No auth object was created!");
+                addErrorMessage(request, "text.error.systemerror");
+                return "redirect:/";
+            }
+
+            // pull account id off state variable
+            String[] stateParts = state.split("_");
+            Integer accountId = null;
+            if (stateParts.length == 2) {
+                accountId = Integer.parseInt(stateParts[1]);
+            } else {
+                logger.error("Unable to retrieve account id from state variable!");
+                addErrorMessage(request, "text.error.systemerror");
+                return "redirect:/";
+            }
+
+            boolean updateResult = accountService.updateAccount(auth.getAccessToken(), auth.getRefreshToken(),
+                    ServiceTypes.YOUTUBE.name(), auth.getExpiresIn(), accountId);
+            if (!updateResult) {
+                addErrorMessage(request, "text.error.systemerror");
+            } else {
+                addSuccessMessage(request, "text.oauth.success");
+            }
+        } catch (Exception e) {
+            logger.error("Unable to process oauth exchange with youtube!", e);
+            addErrorMessage(request, "text.error.systemerror");
+            return "redirect:/";
+        }
+        return "redirect:/settings/accounts/";
+    }
+
+    private YoutubeOAuthResponse exchangeToken(HttpServletRequest request, String initialAuthCode, String redirectUri) {
         HttpPost post = new HttpPost(TOKEN_ENDPOINT);
         List<NameValuePair> values = new ArrayList<>();
         values.add(new BasicNameValuePair("client_id",
                 SecureStorageUtil.getValueKeyFromSecureStorage("youtubeclientid", resourceLoader)));
         values.add(new BasicNameValuePair("client_secret",
                 SecureStorageUtil.getValueKeyFromSecureStorage("youtubeclientsecret", resourceLoader)));
-        values.add(new BasicNameValuePair("redirect_uri", OAuthUtil.buildUrlPath(request, YT_REDIRECT_URI)));
+        values.add(new BasicNameValuePair("redirect_uri", OAuthUtil.buildUrlPath(request, redirectUri)));
         values.add(new BasicNameValuePair("grant_type", "authorization_code"));
         values.add(new BasicNameValuePair("code", initialAuthCode));
         post.setEntity(new UrlEncodedFormEntity(values));

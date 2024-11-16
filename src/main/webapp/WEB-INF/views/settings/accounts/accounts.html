@@ -27,7 +27,7 @@
 			<tr class="">
 				<td style="width: 100px;">[@mb.switchNoLabel name="chatOnly" labelLookupOn="label.active" labelLookupOff="label.inactive" value=account.chatOnly?c extra='data-id="'?no_esc + account.id?no_esc + '"'?no_esc][/@]</td>
 				<td style="width: 200px;">
-					[@mb.buttonIcon "relinkButton-${account.id}" "fa-repeat" "fas" "button.relink" "btn-sm" 'data-id="'?no_esc + account.id?no_esc + '"'?no_esc][/@]
+					[@mb.buttonIcon "relinkButton-${account.id}" "fa-repeat" "fas" "button.relink" "btn-sm" 'data-id="'?no_esc + account.id?no_esc + '" data-service="'?no_esc + account.service?no_esc + '"'?no_esc][/@]
 					[@mb.buttonIcon "deleteButton-${account.id}" "fa-trash" "fas" "button.delete" "btn-sm" 'data-id="'?no_esc + account.id?no_esc + '"'?no_esc][/@]
 			    </td>
 				<td style="width: 300px;">
@@ -45,7 +45,11 @@
 <form id="delete-form" method="POST" action="[@spring.url '/settings/accounts/delete'][/@]" accept-charset="UTF-8">
 	<input type="hidden" name="id" value="">
 </form>
-<form id="relink-form" method="POST" action="[@spring.url '/settings/accounts/relinktwitch'][/@]" accept-charset="UTF-8">
+<form id="relink-twitch-form" method="POST" action="[@spring.url '/settings/accounts/relinktwitch'][/@]" accept-charset="UTF-8">
+	<input type="hidden" name="id" value="">
+</form>
+
+<form id="relink-youtube-form" method="POST" action="[@spring.url '/settings/accounts/relinkyoutube'][/@]" accept-charset="UTF-8">
 	<input type="hidden" name="id" value="">
 </form>
 
@@ -75,8 +79,13 @@ function doDelete() {
 
 function doRelink() {
     if(confirm('[@spring.message "text.accounts.confirm.relink"][/@]')) {
-    	$('#relink-form input[name="id"]').val($(this).data('id'));
-    	$('#relink-form').submit();
+        let service = $(this).data('service');
+        let formName = '#relink-twitch-form';
+        if(service === 'YOUTUBE') {
+			formName = '#relink-youtube-form';
+        }
+    	$(formName + ' input[name="id"]').val($(this).data('id'));
+    	$(formName).submit();
 	}
 }
 </script>

@@ -69,6 +69,14 @@ public class AccountsController extends BaseFrontendController {
         return "redirect:" + youtubeAuthUrl;
     }
 
+    @PostMapping("/relinkyoutube")
+    public String startYoutubeReAuth(HttpServletRequest request,
+            @RequestParam(name = "id", required = true) Long accountId) {
+        UUID uuid = UUID.randomUUID();
+        String youtubeAuthUrl = youtubeUtil.buildYoutubeReauthUrl(request, uuid.toString(), accountId);
+        return "redirect:" + youtubeAuthUrl;
+    }
+
     /**
      * Called from the TwitchOAuthController only.
      * 
