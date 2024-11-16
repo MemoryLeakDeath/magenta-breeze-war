@@ -29,7 +29,7 @@
         <velocity.version>2.4.1</velocity.version>
         <twitch4j.version>1.21.0</twitch4j.version>
         <httpclient.version>5.4</httpclient.version>
-        <youtubeapi.version>v3-rev20241010-2.0.0</youtubeapi.version>
+        <youtubeapi.version>v3-rev20241105-2.0.0</youtubeapi.version>
         <htmlunit.version>4.4.0</htmlunit.version>
         <flyingsaucer.version>9.9.4</flyingsaucer.version>
   </properties>
