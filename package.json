@@ -4,7 +4,7 @@
     "@fortawesome/fontawesome-free": "^6.7.2",
     "bootstrap": "^5.3.3",
     "htmx-ext-sse": "^2.2.3",
-    "htmx.org": "^2.0.3",
+    "htmx.org": "^2.0.4",
     "jquery": "^3.7.1"
   }
 }
