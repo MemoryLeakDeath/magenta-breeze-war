@@ -23,7 +23,7 @@
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
         <faker.version>2.4.1</faker.version>
         <h2.version>2.3.232</h2.version>
-        <freemarker.version>2.3.33</freemarker.version>
+        <freemarker.version>2.3.34</freemarker.version>
         <commonslang.version>3.17.0</commonslang.version>
         <hikari.version>6.2.1</hikari.version>
         <velocity.version>2.4.1</velocity.version>
